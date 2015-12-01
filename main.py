@@ -10,8 +10,7 @@ app = Flask(__name__)
 @app.route('/')
 def hello():
     """Return a friendly HTTP greeting."""
-    return 'Hello World!'
-
+    return 'This is the Astronomy of the Picture API'
 
 @app.errorhandler(404)
 def page_not_found(e):
