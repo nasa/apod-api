@@ -1,0 +1,5 @@
+{
+  "template_name" : "Flask web framework",
+  "template_description" : "Skeleton app based on Flask microframework (http://flask.pocoo.org/)",
+  "open_files": ["main.py"]
+}
