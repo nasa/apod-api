@@ -24,7 +24,7 @@ handlers:
 # The script value is in the format <path.to.module>.<wsgi_application>
 # where <wsgi_application> is a WSGI application object.
 - url: .*  # This regex directs all routes to main.app
-  script: service/apod.app
+  script: apod.app
 
 # Third party libraries that are included in the App Engine SDK must be listed
 # here if you want to use them.  See
