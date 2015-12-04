@@ -75,10 +75,10 @@ curl https://sdk.cloud.google.com | bash
 Follow the install prompts at the command line and then restart your terminal (or just `source .bash_profile` or `source .bashrc`).  Then type the following to authenticate.
 ```bash
 gcloud auth login
+```
 
 See the README file for directions. 
 You'll need python 2.7 and [pip 1.4 or later](http://www.pip-installer.org/en/latest/installing.html) installed too..
-
 
 2. Clone this repo with
 
