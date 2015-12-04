@@ -62,11 +62,9 @@ localhost:5000/v1/apod?date=2014-10-01&concept_tags=True
 }
 ```
 
-## Run Locally
-1. Install the [App Engine Python SDK](https://developers.google.com/appengine/downloads).
-
-
 ## Getting started
+
+1. Install the [App Engine Python SDK](https://developers.google.com/appengine/downloads).
 
 This API runs on Google App Engine.  It's not an easy development environment, especially when compared against to lightweight Flask APIs.  But scaling in production is amazingly simple.  The setup is non-trivial but it's worth it.  
 
@@ -80,6 +78,7 @@ gcloud auth login
 
 See the README file for directions. 
 You'll need python 2.7 and [pip 1.4 or later](http://www.pip-installer.org/en/latest/installing.html) installed too..
+
 
 2. Clone this repo with
 
@@ -102,7 +101,9 @@ of this service.
    IMPORTANT: under NO circumstances should you check in the actual instance of the key into the repository.
    ``` 
 
-5. Run this project locally from the command line:
+## Run Locally
+
+To run this project locally from the command line:
 
    ```
    dev_appserver.py .
@@ -114,6 +115,7 @@ See [the development server documentation](https://developers.google.com/appengi
 for options when running dev_appserver.
 
 ## Deploy
+
 To deploy the application:
 
 1. Use the [Admin Console](https://appengine.google.com) to create a
