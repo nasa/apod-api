@@ -24,12 +24,17 @@ http = urllib3.PoolManager()
 SERVICE_VERSION='v1'
 APOD_METHOD_NAME='apod'
 ALLOWED_APOD_FIELDS = ['concept_tags', 'date']
-ALCHEMY_API_KEY = 'alchemy_api.key'
+ALCHEMY_API_KEY = None
 
 # location of backing APOD service
 BASE = 'http://apod.nasa.gov/apod/'
 
-# The object instance which will do the work
+try:
+    with open('alchemy_api.key', 'r') as f:
+        ALCHEMY_API_KEY = f.read()
+except:
+    print ("WARNING: NO alchemy_api.key found, concept_tagging is NOT supported")
+
 
 def _abort(code, msg, usage=True):
 
@@ -76,7 +81,10 @@ def _apod_handler(date, use_concept_tags=False):
         d['title'] = title
         d['url'] = url
         if use_concept_tags:
-            d['concepts'] = _concepts(explanation, ALCHEMY_API_KEY)
+            if ALCHEMY_API_KEY == None:
+                d['concepts'] = "concept_tags functionality turned off in current service"
+            else:
+                d['concepts'] = _concepts(explanation, ALCHEMY_API_KEY)
         return d
     except Exception, e:
         m = 'Your request could not be processed.'
@@ -93,9 +101,16 @@ def _concepts(text, apikey):
         text=text
     )
 
-    response = json.loads(http.request('GET', cbase, fields=params).data)
-    clist = [concept['text'] for concept in response['concepts']]
-    return {k: v for k, v in zip(range(len(clist)), clist)}
+    try:
+        
+        print ("Getting response")
+        response = json.loads(http.request('GET', cbase, fields=params).data)
+        clist = [concept['text'] for concept in response['concepts']]
+        return {k: v for k, v in zip(range(len(clist)), clist)}
+    
+    except Exception as ex:
+        print (str(ex))
+        raise ValueError(ex)
 
 
 def _title(soup):
@@ -157,7 +172,6 @@ def home():
 @app.route('/'+SERVICE_VERSION+'/'+APOD_METHOD_NAME+'/', methods=['GET','OPTIONS'])
 def apod():
 
-    print ("RUNNING APOD")
     try:
 
         # trap OPTIONS method to handle the x-site issue
