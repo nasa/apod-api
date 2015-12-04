@@ -99,7 +99,7 @@ in the file 'alchemy_api.key'. This supports the concept_tags functionality
 of this service.
 
    ```
-   UNDER no circumstances should you check in the actual instance of the key into the repository.
+   IMPORTANT: under NO circumstances should you check in the actual instance of the key into the repository.
    ``` 
 
 5. Run this project locally from the command line:
