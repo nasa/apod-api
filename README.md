@@ -100,10 +100,7 @@ You'll need python 2.7 and [pip 1.4 or later](http://www.pip-installer.org/en/la
 
 IMPORTANT: under NO circumstances should you check in the actual instance of the key into the repository.
 
-
-## Run Locally
-
-To run this project locally from the command line:
+5. To run this project locally from the command line:
 
    ```
    dev_appserver.py .
