@@ -93,11 +93,13 @@ You'll need python 2.7 and [pip 1.4 or later](http://www.pip-installer.org/en/la
    cd apod-api
    pip install -r requirements.txt -t lib
    ```
+
 4. Optional: obtain a key from http://alchemyapi.com an deposit that file
-in the file 'alchemy_api.key'. This supports the concept_tags functionality
-of this service.
+   in the file 'alchemy_api.key'. This supports the concept_tags functionality
+   of this service.
 
 IMPORTANT: under NO circumstances should you check in the actual instance of the key into the repository.
+
 
 ## Run Locally
 
