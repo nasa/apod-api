@@ -94,7 +94,15 @@ You'll need python 2.7 and [pip 1.4 or later](http://www.pip-installer.org/en/la
    cd apod-api
    pip install -r requirements.txt -t lib
    ```
-4. Run this project locally from the command line:
+4. Optional: obtain a key from http://alchemyapi.com an deposit that file
+in the file 'alchemy_api.key'. This supports the concept_tags functionality
+of this service.
+
+   ```
+   UNDER no circumstances should you check in the actual instance of the key into the repository.
+   ``` 
+
+5. Run this project locally from the command line:
 
    ```
    dev_appserver.py .
