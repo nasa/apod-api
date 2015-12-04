@@ -97,9 +97,7 @@ You'll need python 2.7 and [pip 1.4 or later](http://www.pip-installer.org/en/la
 in the file 'alchemy_api.key'. This supports the concept_tags functionality
 of this service.
 
-   ```
-   IMPORTANT: under NO circumstances should you check in the actual instance of the key into the repository.
-   ``` 
+IMPORTANT: under NO circumstances should you check in the actual instance of the key into the repository.
 
 ## Run Locally
 
