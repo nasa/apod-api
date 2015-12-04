@@ -3,7 +3,10 @@
 A microservice written in Python which may be run on Google App 
 Engine with the [Flask micro framework](http://flask.pocoo.org).
 
-## `/apod`
+## Endpoint: `/<version>/apod`
+
+There is only one endpoint in this service which takes 2 optional fields
+as parameters to a http GET request. A JSON dictionary is returned nominally. 
 
 **Fields**
 
