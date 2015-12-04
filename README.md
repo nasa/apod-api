@@ -1,26 +1,94 @@
-## Python Flask Skeleton for Google App Engine
+# Astronomy Picture of the Day (APOD) microservice
 
-A skeleton for building Python applications on Google App Engine with the
-[Flask micro framework](http://flask.pocoo.org).
+A microservice written in Python which may be run on Google App 
+Engine with the [Flask micro framework](http://flask.pocoo.org).
 
-See our other [Google Cloud Platform github
-repos](https://github.com/GoogleCloudPlatform) for sample applications and
-scaffolding for other python frameworks and use cases.
+## `/apod`
+
+**Fields**
+
+- `date` A string in YYYY-MM-DD format indicating the date of the APOD image (example: 2014-11-03).  Defaults to today's date.  Must be after 1995-06-16, the first day an APOD picture was posted.  There are no images for tomorrow available through this API.
+- `concept_tags` A boolean indicating whether concept tags should be returned with the rest of the response.  The concept tags are not necessarily included in the explanation, but rather derived from common search tags that are associated with the description text.  (Better than just pure text search.)  Defaults to False.
+
+**Returned fields**
+
+- `resource` A dictionary describing the `image_set` or `planet` that the response illustrates, completely determined by the structured endpoint.
+- `concept_tags` A boolean reflection of the supplied option.  Included in response because of default values.
+- `title` The title of the image.
+- `date` Date of image. Included in response because of default values.
+- `url` The URL of the APOD image of the day.
+- `explanation` The supplied text explanation of the image.
+- `concepts` The most relevant concepts within the text explanation.  Only supplied if `concept_tags` is set to True.
+
+**Example**
+
+```bash
+localhost:5000/apod?date=2014-10-01&concept_tags=True
+```
+
+```jsoniq
+{
+    resource: {
+        image_set: "apod"
+    },
+    concept_tags: "True",
+    date: "2013-10-01", 
+    title: "Filaments of the Vela Supernova Remnant",
+    url: "http://apod.nasa.gov/apod/image/1310/velafilaments_jadescope_960.jpg",
+    explanation: "The explosion is over but the consequences continue. About eleven
+    thousand years ago a star in the constellation of Vela could be seen to explode,
+    creating a strange point of light briefly visible to humans living near the 
+    beginning of recorded history. The outer layers of the star crashed into the 
+    interstellar medium, driving a shock wave that is still visible today. A roughly 
+    spherical, expanding shock wave is visible in X-rays. The above image captures some
+    of that filamentary and gigantic shock in visible light. As gas flies away from the
+    detonated star, it decays and reacts with the interstellar medium, producing light
+    in many different colors and energy bands. Remaining at the center of the Vela
+    Supernova Remnant is a pulsar, a star as dense as nuclear matter that rotates
+    completely around more than ten times in a single second.",
+    concepts: {
+        0: "Astronomy",
+        1: "Star",
+        2: "Sun",
+        3: "Milky Way",
+        4: "Hubble Space Telescope",
+        5: "Earth",
+        6: "Nebula",
+        7: "Interstellar medium"
+    }
+}
+```
 
 ## Run Locally
 1. Install the [App Engine Python SDK](https://developers.google.com/appengine/downloads).
-See the README file for directions. You'll need python 2.7 and [pip 1.4 or later](http://www.pip-installer.org/en/latest/installing.html) installed too.
+
+
+## Getting started
+
+This API runs on Google App Engine.  It's not an easy development environment, especially when compared against to lightweight Flask APIs.  But scaling in production is amazingly simple.  The setup is non-trivial but it's worth it.  
+
+I would encourage installing App Engine via [Google Cloud SDK](https://cloud.google.com/sdk/).  It's included in the install.
+```bash
+curl https://sdk.cloud.google.com | bash
+```
+Follow the install prompts at the command line and then restart your terminal (or just `source .bash_profile` or `source .bashrc`).  Then type the following to authenticate.
+```bash
+gcloud auth login
+
+See the README file for directions. 
+You'll need python 2.7 and [pip 1.4 or later](http://www.pip-installer.org/en/latest/installing.html) installed too..
 
 2. Clone this repo with
 
    ```
-   git clone https://github.com/GoogleCloudPlatform/appengine-python-flask-skeleton.git
+   git clone https://github.com/nasa/apod-api.git
    ```
+
 3. Install dependencies in the project's lib directory.
    Note: App Engine can only import libraries from inside your project directory.
 
    ```
-   cd appengine-python-flask-skeleton
+   cd apod-api
    pip install -r requirements.txt -t lib
    ```
 4. Run this project locally from the command line:
@@ -43,20 +111,9 @@ To deploy the application:
    application](https://developers.google.com/appengine/docs/python/tools/uploadinganapp) with
 
    ```
-   appcfg.py -A <your-project-id> --oauth2 update .
+   appcfg.py -A apod-api update .
    ```
-1. Congratulations!  Your application is now live at your-app-id.appspot.com
-
-## Next Steps
-This skeleton includes `TODO` markers to help you find basic areas you will want
-to customize.
-
-### Relational Databases and Datastore
-To add persistence to your models, use
-[NDB](https://developers.google.com/appengine/docs/python/ndb/) for
-scale.  Consider
-[CloudSQL](https://developers.google.com/appengine/docs/python/cloud-sql)
-if you need a relational database.
+1. Congratulations!  Your application is now live at apod-api.appspot.com
 
 ### Installing Libraries
 See the [Third party
@@ -69,11 +126,9 @@ the SDK, only pure python libraries may be added to an App Engine project.
 Star this repo if you found it useful. Use the github issue tracker to give
 feedback on this repo.
 
-## Contributing changes
-See [CONTRIB.md](CONTRIB.md)
-
 ## Licensing
 See [LICENSE](LICENSE)
 
 ## Author
-Logan Henriquez and Johan Euphrosine
+Brian Thomas (based on code by Dan Hammer) 
+
