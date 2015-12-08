@@ -64,7 +64,7 @@ def _apod_characteristics(date):
             url = '%sap%s.html' % (BASE, date_str)
             soup = BeautifulSoup(http.request('GET', url).data)
             suffix = soup.img['src']
-            return _explanation(soup), _title(soup), BASE + suffix
+            return _explanation(soup), _title(soup), _copyright(soup), BASE + suffix
         
         except Exception as ex:
             print (str(ex))
@@ -76,10 +76,12 @@ def _apod_handler(date, use_concept_tags=False):
     try:
         d = {}
         d['date'] = date
-        explanation, title, url = _apod_characteristics(date)
+        explanation, title, copyright, url = _apod_characteristics(date)
         d['explanation'] = explanation
         d['title'] = title
         d['url'] = url
+        if copyright:
+            d['copyright'] = copyright
         if use_concept_tags:
             if ALCHEMY_API_KEY == None:
                 d['concepts'] = "concept_tags functionality turned off in current service"
@@ -127,6 +129,27 @@ def _title(soup):
         text = soup.title.text.split(' - ')[-1]
         return text.strip()
     else:
+        raise ValueError('Unsupported schema for given date.')
+
+def _copyright(soup):
+    """Accepts a BeautifulSoup object for the APOD HTML page and returns the
+    APOD image copyright.  Highly idiosyncratic with adaptations for different
+    HTML structures that appear over time."""
+    try:
+        # Handler for later APOD entries
+        center_selection = soup.find_all('center')[1]
+        bold_selection = center_selection.find_all('b')[1]
+        if "Copyright" in bold_selection.text:
+            # pull the copyright from the link text
+            link_selection = center_selection.find_all('a')[0]
+            if "Copyright" in link_selection.text:
+                # hmm. older style, try to grab from 2nd link
+                link_selection = center_selection.find_all('a')[1]
+            return link_selection.text.strip(' ')
+        else:
+            # NO stated copyright, so we return None
+            return None
+    except Exception:
         raise ValueError('Unsupported schema for given date.')
 
 def _explanation(soup):

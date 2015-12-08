@@ -8,8 +8,8 @@ class TestApod(unittest.TestCase):
         self.date = '2013-10-01'
 
     def test_apod_characteristics(self):
-        explanation, title, url = apod._apod_characteristics(self.date)
-
+        explanation, title, copyright, url = apod._apod_characteristics(self.date)
+        
         # Test returned Title
         expected_title = 'Filaments of the Vela Supernova Remnant'
         self.assertEqual(title, expected_title)
