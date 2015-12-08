@@ -30,7 +30,7 @@ For example, using curl (http://curl.haxx.se):
 </p><p>
 <font size="+2">
 <pre>
-curl http://{{ service_url }}/{{ version }}/{{ methodname }}/?concept_tags=True&amp;date=2010-1-1
+curl http://{{ service_url }}/{{ version }}/{{ methodname }}/?concept_tags=True&amp;date=2015-10-11
 </pre>
 </font>
 </p><p>
@@ -40,15 +40,12 @@ For example, the return JSON from the above query is:
 </p><p>
 <pre>
 {
-  "dictionary": "nasa_opendata_trained_model_09_17_15.pkl",
-  "highest_ngram_allowed": 5,
-  "keywords": [
-    "nasa",
-    "rockets"
-  ],
+  "concepts": "concept_tags functionality turned off in current service",
+  "date": "2015-10-11",
+  "explanation": "Clouds of glowing gas mingle with dust lanes in the Trifid Nebula, a star forming region toward the constellation of the Archer (Sagittarius).  In the center, the three prominent dust lanes that give the Trifid its name all come together. Mountains of opaque dust appear on the right, while other dark filaments of dust are visible threaded throughout the nebula.  A single massive star visible near the center causes much of the Trifid's glow.  The Trifid, also known as M20, is only about 300,000 years old, making it among the youngest emission nebulae known.  The nebula lies about 9,000 light years away and the part pictured here spans about 10 light years.  The above image is a composite with luminance taken from an image by the 8.2-m ground-based Subaru Telescope, detail provided by the 2.4-m orbiting Hubble Space Telescope, color data provided by Martin Pugh and image assembly and processing provided by Robert Gendler.   Follow APOD on: Facebook,  Google Plus, or Twitter",
   "service_version": "v1",
-  "term_count_threshold": 1,
-  "textmining_library_version": "0.5.1"
+  "title": "In the Center of the Trifid Nebula",
+  "url": "http://apod.nasa.gov/apod/image/1510/Trifid_HubbleGendler_960.jpg"
 }
 </pre>
 </p><p>
