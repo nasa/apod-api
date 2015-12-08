@@ -14,10 +14,9 @@ from flask import request, jsonify, render_template, Response, Flask
 import json
 from datetime import datetime
 from bs4 import BeautifulSoup
-import urllib3
+import requests
 
 app = Flask(__name__)
-http = urllib3.PoolManager()
 
 # this should reflect both this service and the backing 
 # assorted libraries
@@ -62,7 +61,7 @@ def _apod_characteristics(date):
             
             date_str = dt.strftime('%y%m%d')
             url = '%sap%s.html' % (BASE, date_str)
-            soup = BeautifulSoup(http.request('GET', url).data)
+            soup = BeautifulSoup(requests.get(url).text)
             suffix = soup.img['src']
             return _explanation(soup), _title(soup), _copyright(soup), BASE + suffix
         

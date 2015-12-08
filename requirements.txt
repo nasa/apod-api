@@ -6,4 +6,4 @@
 # Note: The `lib` directory is added to `sys.path` by `appengine_config.py`.
 Flask==0.10
 beautifulsoup4==4.3.2
-urllib3==1.12
+requests==2.8.1
