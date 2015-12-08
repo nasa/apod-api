@@ -12,6 +12,9 @@ runtime: python27
 api_version: 1
 threadsafe: yes
 
+env_variables:
+  GAE_USE_SOCKETS_HTTPLIB : '1'
+
 # Handlers define how to route requests to your application.
 handlers:
 
