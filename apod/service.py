@@ -7,8 +7,6 @@
     @author=danhammer 
     @author=bathomas @email=brian.a.thomas@nasa.gov
 '''
-import sys
-sys.path.insert(0, 'lib')
 
 from flask import request, jsonify, render_template, Response, Flask
 import json
@@ -34,7 +32,6 @@ try:
 except:
     print ("WARNING: NO alchemy_api.key found, concept_tagging is NOT supported")
 
-
 def _abort(code, msg, usage=True):
 
     if (usage):
@@ -42,13 +39,14 @@ def _abort(code, msg, usage=True):
 
     response = jsonify(service_version=SERVICE_VERSION, msg=msg)
     response.status_code = code
+    print (str(response))
     return response
 
 def _apod_characteristics(date):
     """Accepts a date in '%Y-%m-%d' format. Returns the URL of the APOD image
     of that day, noting that """
     today = datetime.today()
-    begin = datetime(1995, 06, 16)  # first APOD image date
+    begin = datetime (1995, 6, 16)  # first APOD image date
     dt = datetime.strptime(date, '%Y-%m-%d')
     if (dt > today) or (dt < begin):
         today_str = today.strftime('%b %d, %Y')
@@ -61,7 +59,7 @@ def _apod_characteristics(date):
             
             date_str = dt.strftime('%y%m%d')
             url = '%sap%s.html' % (BASE, date_str)
-            soup = BeautifulSoup(requests.get(url).text)
+            soup = BeautifulSoup(requests.get(url).text, "html.parser")
             suffix = soup.img['src']
             return _explanation(soup), _title(soup), _copyright(soup), BASE + suffix
         
@@ -88,7 +86,7 @@ def _apod_handler(date, use_concept_tags=False):
             else:
                 d['concepts'] = _concepts(explanation, ALCHEMY_API_KEY)
         return d
-    except Exception, e:
+    except Exception as e:
         m = 'Your request could not be processed.'
         return dict(message=m, error=str(e))
     
@@ -106,7 +104,7 @@ def _concepts(text, apikey):
     try:
         
         print ("Getting response")
-        response = json.loads(http.request('GET', cbase, fields=params).data)
+        response = json.loads(request.get(cbase, fields=params))
         clist = [concept['text'] for concept in response['concepts']]
         return {k: v for k, v in zip(range(len(clist)), clist)}
     
@@ -189,8 +187,6 @@ def home():
                             service_url=request.host, \
                             methodname=APOD_METHOD_NAME, \
 			    usage=_usage(joinstr='", "', prestr='"')+'"')
-
-
 
 @app.route('/'+SERVICE_VERSION+'/'+APOD_METHOD_NAME+'/', methods=['GET','OPTIONS'])
 def apod():
