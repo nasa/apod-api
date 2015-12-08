@@ -67,7 +67,8 @@ def _apod_characteristics(date):
             return _explanation(soup), _title(soup), _copyright(soup), BASE + suffix
         
         except Exception as ex:
-            print (str(ex))
+            print ("EXCEPTION: "+str(ex))
+            # this most probably should return code 500 here
             raise ValueError('No APOD imagery for the given date.')
 
 def _apod_handler(date, use_concept_tags=False):
