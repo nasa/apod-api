@@ -190,20 +190,10 @@ def home():
                             methodname=APOD_METHOD_NAME, \
 			    usage=_usage(joinstr='", "', prestr='"')+'"')
 
-@app.route('/'+SERVICE_VERSION+'/'+APOD_METHOD_NAME+'/', methods=['GET','OPTIONS'])
+@app.route('/'+SERVICE_VERSION+'/'+APOD_METHOD_NAME+'/', methods=['GET'])
 def apod():
 
     try:
-
-        # trap OPTIONS method to handle the x-site issue
-        if request.method == "OPTIONS": 
-            response = Response("", status=200, mimetype='application/json') 
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
-            response.headers['Access-Control-Max-Age'] = 1000
-            # note that '*' is not valid for Access-Control-Allow-Headers
-            response.headers['Access-Control-Allow-Headers'] = 'origin, x-csrftoken, content-type, accept'
-            return response
 
         # application/json GET method 
         args = request.args
