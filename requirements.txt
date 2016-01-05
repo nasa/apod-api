@@ -4,7 +4,7 @@
 # in `lib/` subdirectory.
 #
 # Note: The `lib` directory is added to `sys.path` by `appengine_config.py`.
-Flask==0.10.1
+Flask-Cors==2.1.2
 gunicorn==19.3.0
 Jinja2==2.8
 Werkzeug==0.10.4

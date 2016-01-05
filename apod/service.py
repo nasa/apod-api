@@ -8,13 +8,15 @@
     @author=bathomas @email=brian.a.thomas@nasa.gov
 '''
 
-from flask import request, jsonify, render_template, Response, Flask
-import json
-from datetime import datetime
 from bs4 import BeautifulSoup
+from datetime import datetime
+from flask import request, jsonify, render_template, Response, Flask
+from flask.ext.cors import CORS
+import json
 import requests
 
 app = Flask(__name__)
+CORS(app)
 
 # this should reflect both this service and the backing 
 # assorted libraries
