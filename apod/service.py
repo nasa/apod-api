@@ -50,6 +50,8 @@ def _abort(code, msg, usage=True):
 def _apod_characteristics(date):
     """Accepts a date in '%Y-%m-%d' format. Returns the URL of the APOD image
     of that day, noting that """
+
+    print("apod chars called")
     today = datetime.today()
     begin = datetime (1995, 6, 16)  # first APOD image date
     dt = datetime.strptime(date, '%Y-%m-%d')
@@ -62,20 +64,30 @@ def _apod_characteristics(date):
     else:
         try:
             
+            media_type = 'image'
             date_str = dt.strftime('%y%m%d')
-            url = '%sap%s.html' % (BASE, date_str)
-            soup = BeautifulSoup(requests.get(url).text, "html.parser")
-            suffix = soup.img['src']
-            hd_suffix = suffix
+            apod_url = '%sap%s.html' % (BASE, date_str)
+            print ("OPENING URL:"+apod_url)
+            soup = BeautifulSoup(requests.get(apod_url).text, "html.parser")
+            print ("getting the data url")
+            data = None
+            hd_data = None
+            if soup.img:
+                # it is an image, so get both the low- and high-resolution data
+                data = BASE + soup.img['src']
+                hd_data = data
+                
+                print ("getting the link for hd_data")
+                for link in soup.find_all('a', href=True):
+                    if link['href'] and link['href'].startswith("image"):
+                        hd_data = BASE + link['href']
+                        break
+            else:
+                # its a video
+                media_type = 'video'
+                data = soup.iframe['src']
             
-            for link in soup.find_all('a', href=True):
-                print ("link:"+str(link))
-                if link['href'] and link['href'].startswith("image"):
-                    print ("  href:"+str(link['href']))
-                    hd_suffix = link['href']
-                    break
-            
-            return _explanation(soup), _title(soup), _copyright(soup), BASE + suffix, BASE + hd_suffix
+            return _explanation(soup), _title(soup), _copyright(soup), data, hd_data, media_type
         
         except Exception as ex:
             print ("EXCEPTION: "+str(ex))
@@ -88,11 +100,12 @@ def _apod_handler(date, use_concept_tags=False):
     try:
         d = {}
         d['date'] = date
-        explanation, title, copyright, url, hdurl = _apod_characteristics(date)
+        explanation, title, copyright, url, hdurl, media_type = _apod_characteristics(date)
         d['explanation'] = explanation
         d['title'] = title
         d['url'] = url
         d['hdurl'] = hdurl
+        d['media_type'] = media_type
         if copyright:
             d['copyright'] = copyright
         if use_concept_tags:
@@ -132,6 +145,7 @@ def _title(soup):
     """Accepts a BeautifulSoup object for the APOD HTML page and returns the
     APOD image title.  Highly idiosyncratic with adaptations for different
     HTML structures that appear over time."""
+    print ("getting the title")
     try:
         # Handler for later APOD entries
         center_selection = soup.find_all('center')[1]
@@ -148,6 +162,7 @@ def _copyright(soup):
     """Accepts a BeautifulSoup object for the APOD HTML page and returns the
     APOD image copyright.  Highly idiosyncratic with adaptations for different
     HTML structures that appear over time."""
+    print ("getting the copyright")
     try:
         # Handler for later APOD entries
         center_selection = soup.find_all('center')[1]
@@ -169,6 +184,7 @@ def _explanation(soup):
     """Accepts a BeautifulSoup object for the APOD HTML page and returns the
     APOD image explanation.  Highly idiosyncratic."""
     # Handler for later APOD entries
+    print ("getting the explanation")
     s = soup.find_all('p')[2].text
     s = s.replace('\n', ' ')
     s = s.replace('  ', ' ')
