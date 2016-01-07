@@ -12,6 +12,7 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 
 - `date` A string in YYYY-MM-DD format indicating the date of the APOD image (example: 2014-11-03).  Defaults to today's date.  Must be after 1995-06-16, the first day an APOD picture was posted.  There are no images for tomorrow available through this API.
 - `concept_tags` A boolean indicating whether concept tags should be returned with the rest of the response.  The concept tags are not necessarily included in the explanation, but rather derived from common search tags that are associated with the description text.  (Better than just pure text search.)  Defaults to False.
+- `hd` A boolean parameter indicating whether or not high-resolution images should be returned. This is present for legacy purposes, it is always ignored by the service and high-resolution urls are returned regardless.
 
 **Returned fields**
 
@@ -19,7 +20,9 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 - `concept_tags` A boolean reflection of the supplied option.  Included in response because of default values.
 - `title` The title of the image.
 - `date` Date of image. Included in response because of default values.
-- `url` The URL of the APOD image of the day.
+- `url` The URL of the APOD image or video of the day.
+- `hdurl` The URL for any high-resolution image for that day. Always returned but the value will be 'null' on dates which have video.
+- `media_type` The type of media (data) returned. May either be 'image' or 'video' depending on content.
 - `explanation` The supplied text explanation of the image.
 - `concepts` The most relevant concepts within the text explanation.  Only supplied if `concept_tags` is set to True.
 
