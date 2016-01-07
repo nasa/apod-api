@@ -10,19 +10,22 @@
 
 from bs4 import BeautifulSoup
 from datetime import datetime
-from flask import request, jsonify, render_template, Response, Flask
+from flask import request, jsonify, render_template, Flask
 from flask.ext.cors import CORS
 import json
 import requests
+import logging
 
 app = Flask(__name__)
 CORS(app)
+
+LOG = logging.getLogger(__name__)
 
 # this should reflect both this service and the backing 
 # assorted libraries
 SERVICE_VERSION='v1'
 APOD_METHOD_NAME='apod'
-ALLOWED_APOD_FIELDS = ['concept_tags', 'date']
+ALLOWED_APOD_FIELDS = ['concept_tags', 'date', 'hd']
 ALCHEMY_API_KEY = None
 
 # location of backing APOD service
@@ -63,7 +66,16 @@ def _apod_characteristics(date):
             url = '%sap%s.html' % (BASE, date_str)
             soup = BeautifulSoup(requests.get(url).text, "html.parser")
             suffix = soup.img['src']
-            return _explanation(soup), _title(soup), _copyright(soup), BASE + suffix
+            hd_suffix = suffix
+            
+            for link in soup.find_all('a', href=True):
+                print ("link:"+str(link))
+                if link['href'] and link['href'].startswith("image"):
+                    print ("  href:"+str(link['href']))
+                    hd_suffix = link['href']
+                    break
+            
+            return _explanation(soup), _title(soup), _copyright(soup), BASE + suffix, BASE + hd_suffix
         
         except Exception as ex:
             print ("EXCEPTION: "+str(ex))
@@ -76,10 +88,11 @@ def _apod_handler(date, use_concept_tags=False):
     try:
         d = {}
         d['date'] = date
-        explanation, title, copyright, url = _apod_characteristics(date)
+        explanation, title, copyright, url, hdurl = _apod_characteristics(date)
         d['explanation'] = explanation
         d['title'] = title
         d['url'] = url
+        d['hdurl'] = hdurl
         if copyright:
             d['copyright'] = copyright
         if use_concept_tags:
