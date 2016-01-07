@@ -104,7 +104,8 @@ def _apod_handler(date, use_concept_tags=False):
         d['explanation'] = explanation
         d['title'] = title
         d['url'] = url
-        d['hdurl'] = hdurl
+        if hdurl:
+            d['hdurl'] = hdurl
         d['media_type'] = media_type
         if copyright:
             d['copyright'] = copyright
