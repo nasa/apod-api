@@ -9,7 +9,7 @@
 '''
 
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import request, jsonify, render_template, Flask
 from flask.ext.cors import CORS
 import json
@@ -42,65 +42,71 @@ def _abort(code, msg, usage=True):
     if (usage):
         msg += " "+_usage()+"'" 
 
-    response = jsonify(service_version=SERVICE_VERSION, msg=msg)
+    response = jsonify(service_version=SERVICE_VERSION, msg=msg, code=code)
     response.status_code = code
     LOG.debug(str(response))
+    
     return response
 
-def _apod_characteristics(date):
+def _get_apod_chars(dt):
+    
+    media_type = 'image'
+    date_str = dt.strftime('%y%m%d')
+    apod_url = '%sap%s.html' % (BASE, date_str)
+    LOG.debug("OPENING URL:"+apod_url)
+    soup = BeautifulSoup(requests.get(apod_url).text, "html.parser")
+    LOG.debug("getting the data url")
+    data = None
+    hd_data = None
+    if soup.img:
+        # it is an image, so get both the low- and high-resolution data
+        data = BASE + soup.img['src']
+        hd_data = data
+        
+        LOG.debug("getting the link for hd_data")
+        for link in soup.find_all('a', href=True):
+            if link['href'] and link['href'].startswith("image"):
+                hd_data = BASE + link['href']
+                break
+    else:
+        # its a video
+        media_type = 'video'
+        data = soup.iframe['src']
+    
+    return _explanation(soup), _title(soup), _copyright(soup), data, hd_data, media_type
+        
+        
+def _apod_characteristics(dt, use_default_today_date=False):
     """Accepts a date in '%Y-%m-%d' format. Returns the URL of the APOD image
     of that day, noting that """
 
     LOG.debug("apod chars called")
-    today = datetime.today()
-    begin = datetime (1995, 6, 16)  # first APOD image date
-    dt = datetime.strptime(date, '%Y-%m-%d')
-    if (dt > today) or (dt < begin):
-        today_str = today.strftime('%b %d, %Y')
-        begin_str = begin.strftime('%b %d, %Y')
-        raise ValueError(
-            'Date must be between %s and %s.' % (begin_str, today_str)
-        )
-    else:
-        try:
-            
-            media_type = 'image'
-            date_str = dt.strftime('%y%m%d')
-            apod_url = '%sap%s.html' % (BASE, date_str)
-            LOG.debug("OPENING URL:"+apod_url)
-            soup = BeautifulSoup(requests.get(apod_url).text, "html.parser")
-            LOG.debug("getting the data url")
-            data = None
-            hd_data = None
-            if soup.img:
-                # it is an image, so get both the low- and high-resolution data
-                data = BASE + soup.img['src']
-                hd_data = data
-                
-                LOG.debug("getting the link for hd_data")
-                for link in soup.find_all('a', href=True):
-                    if link['href'] and link['href'].startswith("image"):
-                        hd_data = BASE + link['href']
-                        break
-            else:
-                # its a video
-                media_type = 'video'
-                data = soup.iframe['src']
-            
-            return _explanation(soup), _title(soup), _copyright(soup), data, hd_data, media_type
+    
+    try:
         
-        except Exception as ex:
-            LOG.error("Caught exception type:"+str(type(ex))+" msg:"+str(ex))
-            # this most probably should return code 500 here
-            raise ValueError('No APOD imagery for the given date.')
-
-def _apod_handler(date, use_concept_tags=False):
+        return _get_apod_chars(dt)
+    
+    except Exception as ex:
+        
+        # handle edge case where the service local time
+        # miss-matches with 'todays date' of the underlying APOD
+        # service (can happen because they are deployed in different
+        # timezones). Use the fallback of prior day's date 
+        
+        if use_default_today_date:
+            # try to get the day before
+            dt = dt - timedelta(days=1)
+            return _get_apod_chars(dt)
+        else:
+            # pass exception up the call stack
+            raise Exception(ex)
+                
+def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False):
     """Accepts a parameter dictionary. Returns the response object to be
     served through the API."""
     try:
         d = {}
-        d['date'] = date
-        explanation, title, copyright, url, hdurl, media_type = _apod_characteristics(date)
+        explanation, title, copyright, url, hdurl, media_type = _apod_characteristics(dt, use_default_today_date)
         d['explanation'] = explanation
         d['title'] = title
         d['url'] = url
@@ -115,9 +121,12 @@ def _apod_handler(date, use_concept_tags=False):
             else:
                 d['concepts'] = _concepts(explanation, ALCHEMY_API_KEY)
         return d
+    
     except Exception as e:
-        m = 'Your request could not be processed.'
-        return dict(message=m, error=str(e))
+        
+        LOG.error("Internal Service Error :"+str(type(e))+" msg:"+str(e))
+        # return code 500 here
+        return _abort(500, "Internal Service Error", usage=False)
     
 def _concepts(text, apikey):
     """Returns the concepts associated with the text, interleaved with integer
@@ -209,6 +218,20 @@ def _validate (data):
             return False
     return True
 
+def _validate_date (dt):
+    
+    today = datetime.today()
+    begin = datetime (1995, 6, 16)  # first APOD image date
+    
+    # validate input 
+    if (dt > today) or (dt < begin):
+        
+        today_str = today.strftime('%b %d, %Y')
+        begin_str = begin.strftime('%b %d, %Y')
+        
+        raise ValueError('Date must be between %s and %s.' % (begin_str, today_str))
+        
+    
 # Endpoints
 #
 
@@ -230,16 +253,32 @@ def apod():
         if not _validate(args):
             return _abort (400, "Bad Request incorrect field passed.")
         
-        date = args.get('date', datetime.strftime(datetime.today(), '%Y-%m-%d'))
+        # get the date param
+        use_default_today_date = False
+        date = args.get('date')
+        if not date:
+            # fall back to using today's date IF they didn't specify a date
+            date = datetime.strftime(datetime.today(), '%Y-%m-%d')
+            use_default_today_date = True
+            
+        # grab the concept_tags param
         use_concept_tags = args.get('concept_tags', False)
         
+        # validate input date
+        dt = datetime.strptime(date, '%Y-%m-%d')
+        _validate_date(dt)
+        
         # get data
-        data = _apod_handler(date, use_concept_tags)
+        data = _apod_handler(dt, use_concept_tags, use_default_today_date)
+        data['date'] = date
         data['service_version'] = SERVICE_VERSION
         
         # return info as JSON
         return jsonify(data)
 
+    except ValueError as ve:
+        return _abort(400, str(ve), False)
+        
     except Exception as ex:
 
         etype = type(ex)
