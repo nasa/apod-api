@@ -35,7 +35,7 @@ try:
     with open('alchemy_api.key', 'r') as f:
         ALCHEMY_API_KEY = f.read()
 except:
-    print ("WARNING: NO alchemy_api.key found, concept_tagging is NOT supported")
+    LOG.info ("WARNING: NO alchemy_api.key found, concept_tagging is NOT supported")
 
 def _abort(code, msg, usage=True):
 
@@ -44,14 +44,14 @@ def _abort(code, msg, usage=True):
 
     response = jsonify(service_version=SERVICE_VERSION, msg=msg)
     response.status_code = code
-    print (str(response))
+    LOG.debug(str(response))
     return response
 
 def _apod_characteristics(date):
     """Accepts a date in '%Y-%m-%d' format. Returns the URL of the APOD image
     of that day, noting that """
 
-    print("apod chars called")
+    LOG.debug("apod chars called")
     today = datetime.today()
     begin = datetime (1995, 6, 16)  # first APOD image date
     dt = datetime.strptime(date, '%Y-%m-%d')
@@ -67,9 +67,9 @@ def _apod_characteristics(date):
             media_type = 'image'
             date_str = dt.strftime('%y%m%d')
             apod_url = '%sap%s.html' % (BASE, date_str)
-            print ("OPENING URL:"+apod_url)
+            LOG.debug("OPENING URL:"+apod_url)
             soup = BeautifulSoup(requests.get(apod_url).text, "html.parser")
-            print ("getting the data url")
+            LOG.debug("getting the data url")
             data = None
             hd_data = None
             if soup.img:
@@ -77,7 +77,7 @@ def _apod_characteristics(date):
                 data = BASE + soup.img['src']
                 hd_data = data
                 
-                print ("getting the link for hd_data")
+                LOG.debug("getting the link for hd_data")
                 for link in soup.find_all('a', href=True):
                     if link['href'] and link['href'].startswith("image"):
                         hd_data = BASE + link['href']
@@ -90,7 +90,7 @@ def _apod_characteristics(date):
             return _explanation(soup), _title(soup), _copyright(soup), data, hd_data, media_type
         
         except Exception as ex:
-            print ("EXCEPTION: "+str(ex))
+            LOG.error("Caught exception type:"+str(type(ex))+" msg:"+str(ex))
             # this most probably should return code 500 here
             raise ValueError('No APOD imagery for the given date.')
 
@@ -132,13 +132,12 @@ def _concepts(text, apikey):
 
     try:
         
-        print ("Getting response")
+        LOG.debug("Getting response")
         response = json.loads(request.get(cbase, fields=params))
         clist = [concept['text'] for concept in response['concepts']]
         return {k: v for k, v in zip(range(len(clist)), clist)}
     
     except Exception as ex:
-        print (str(ex))
         raise ValueError(ex)
 
 
@@ -146,7 +145,7 @@ def _title(soup):
     """Accepts a BeautifulSoup object for the APOD HTML page and returns the
     APOD image title.  Highly idiosyncratic with adaptations for different
     HTML structures that appear over time."""
-    print ("getting the title")
+    LOG.debug("getting the title")
     try:
         # Handler for later APOD entries
         center_selection = soup.find_all('center')[1]
@@ -163,7 +162,7 @@ def _copyright(soup):
     """Accepts a BeautifulSoup object for the APOD HTML page and returns the
     APOD image copyright.  Highly idiosyncratic with adaptations for different
     HTML structures that appear over time."""
-    print ("getting the copyright")
+    LOG.debug("getting the copyright")
     try:
         # Handler for later APOD entries
         center_selection = soup.find_all('center')[1]
@@ -185,7 +184,7 @@ def _explanation(soup):
     """Accepts a BeautifulSoup object for the APOD HTML page and returns the
     APOD image explanation.  Highly idiosyncratic."""
     # Handler for later APOD entries
-    print ("getting the explanation")
+    LOG.debug("getting the explanation")
     s = soup.find_all('p')[2].text
     s = s.replace('\n', ' ')
     s = s.replace('  ', ' ')
@@ -244,11 +243,10 @@ def apod():
     except Exception as ex:
 
         etype = type(ex)
-        #print (str(etype)+"\n "+str(ex))
         if etype == ValueError or "BadRequest" in str(etype):
             return _abort(400, str(ex)+".")
         else:
-            print ("Service Exception. Msg: "+str(type(ex))) 
+            LOG.error("Service Exception. Msg: "+str(type(ex))) 
             return _abort(500, "Internal Service Error", usage=False)
 
 @app.errorhandler(404)
