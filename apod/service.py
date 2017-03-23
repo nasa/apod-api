@@ -20,6 +20,8 @@ app = Flask(__name__)
 CORS(app)
 
 LOG = logging.getLogger(__name__)
+logging.basicConfig(level=logging.WARN)
+#LOG.setLevel(logging.DEBUG)
 
 # this should reflect both this service and the backing 
 # assorted libraries
@@ -107,6 +109,7 @@ def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False):
     try:
         d = {}
         explanation, title, copyright, url, hdurl, media_type = _apod_characteristics(dt, use_default_today_date)
+        LOG.debug("managed to get apod characteristics")
         d['explanation'] = explanation
         d['title'] = title
         d['url'] = url
@@ -174,20 +177,31 @@ def _copyright(soup):
     LOG.debug("getting the copyright")
     try:
         # Handler for later APOD entries
-        center_selection = soup.find_all('center')[1]
-        bold_selection = center_selection.find_all('b')[1]
-        if "Copyright" in bold_selection.text:
-            # pull the copyright from the link text
-            link_selection = center_selection.find_all('a')[0]
-            if "Copyright" in link_selection.text:
-                # hmm. older style, try to grab from 2nd link
-                link_selection = center_selection.find_all('a')[1]
-            return link_selection.text.strip(' ')
-        else:
-            # NO stated copyright, so we return None
-            return None
-    except Exception:
+
+        # There's no uniform handling of copyright (sigh). Well, we just have to 
+        # try every stinking text block we find...
+
+        for element in soup.findAll('b', text=True):
+            #LOG.debug("TEXT: "+element.text)
+            # search text for explicit match
+            if "Copyright" in element.text:
+                LOG.debug("Found Copyright text:"+str(element.text))
+                LOG.debug("                element:"+str(element))
+                # pull the copyright from the link text
+                link_selection = element.parent.find_all('a')[0] 
+                if "Copyright" in link_selection.text:
+                    # hmm. older style, try to grab from 2nd link
+                    LOG.debug("trying olderstyle copyright grab")
+                    link_selection = element.parent.find_all('a')[1]
+                # return
+                return link_selection.text.strip(' ')
+
+    except Exception as ex:
+        LOG.error(str(ex))
         raise ValueError('Unsupported schema for given date.')
+
+    # NO stated copyright, so we return None
+    return None
 
 def _explanation(soup):
     """Accepts a BeautifulSoup object for the APOD HTML page and returns the
