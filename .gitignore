@@ -1,6 +1,7 @@
 *.pyc
 .project
 .pydevproject
+env/ 
 alchemy_api.key
 # don't include third-party dependencies.
 lib/
