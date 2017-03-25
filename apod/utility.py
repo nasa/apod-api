@@ -44,8 +44,20 @@ def _get_apod_chars(dt):
         media_type = 'video'
         data = soup.iframe['src']
     
-    return _explanation(soup), _title(soup), _copyright(soup), data, hd_data, media_type
+    
+    props = {}
         
+    props['explanation'] = _explanation(soup) 
+    props['title'] = _title(soup) 
+    props['copyright'] = _copyright(soup)
+    props['media_type'] = media_type
+    props['url'] = data
+    
+    if hd_data:
+        props['hdurl'] = hd_data
+        
+    return props
+
 def _title(soup):
     """Accepts a BeautifulSoup object for the APOD HTML page and returns the
     APOD image title.  Highly idiosyncratic with adaptations for different
@@ -73,21 +85,44 @@ def _copyright(soup):
 
         # There's no uniform handling of copyright (sigh). Well, we just have to 
         # try every stinking text block we find...
-
-        for element in soup.findAll('b', text=True):
+        
+        copyright = None
+        use_next = False
+        for element in soup.findAll('a', text=True):
             #LOG.debug("TEXT: "+element.text)
-            # search text for explicit match
+            
+            if use_next:
+                copyright = element.text.strip(' ')
+                break
+                        
             if "Copyright" in element.text:
                 LOG.debug("Found Copyright text:"+str(element.text))
-                LOG.debug("                element:"+str(element))
-                # pull the copyright from the link text
-                link_selection = element.parent.find_all('a')[0] 
-                if "Copyright" in link_selection.text:
-                    # hmm. older style, try to grab from 2nd link
-                    LOG.debug("trying olderstyle copyright grab")
-                    link_selection = element.parent.find_all('a')[1]
-                # return
-                return link_selection.text.strip(' ')
+                use_next = True
+                
+                
+        if not copyright:
+                
+            for element in soup.findAll(['b','a'], text=True):
+                #LOG.debug("TEXT: "+element.text)
+                # search text for explicit match
+                if "Copyright" in element.text:
+                    LOG.debug("Found Copyright text:"+str(element.text))
+                    # pull the copyright from the link text
+                    # which follows
+                    sibling = element.next_sibling
+                    stuff = ""
+                    while (sibling):
+                        try:
+                            stuff = stuff + sibling.text
+                        except Exception:
+                            pass
+                        sibling = sibling.next_sibling
+                    
+                    if stuff:
+                        copyright = stuff.strip(' ')
+                    
+                
+        return copyright
 
     except Exception as ex:
         LOG.error(str(ex))
@@ -123,9 +158,8 @@ def parse_apod (dt, use_default_today_date=False):
     LOG.debug("apod chars called date:"+str(dt))
     
     try:
-        
         return _get_apod_chars(dt)
-    
+        
     except Exception as ex:
         
         # handle edge case where the service local time

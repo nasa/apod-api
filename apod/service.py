@@ -74,27 +74,16 @@ def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False):
     """Accepts a parameter dictionary. Returns the response object to be
     served through the API."""
     try:
-        d = {}
-        explanation, title, copyrght, url, hdurl, media_type = parse_apod(dt, use_default_today_date)
-        LOG.debug("managed to get apod characteristics")
+        page_props = parse_apod(dt, use_default_today_date)
+        LOG.debug("managed to get apod page characteristics")
         
-        d['explanation'] = explanation
-        d['title'] = title
-        d['url'] = url
-        if hdurl:
-            d['hdurl'] = hdurl
-        d['media_type'] = media_type
-        
-        if copyrght:
-            d['copyright'] = copyrght
-            
         if use_concept_tags:
             if ALCHEMY_API_KEY == None:
-                d['concepts'] = "concept_tags functionality turned off in current service"
+                page_props['concepts'] = "concept_tags functionality turned off in current service"
             else:
-                d['concepts'] = get_concepts(request, explanation, ALCHEMY_API_KEY)
+                page_props['concepts'] = get_concepts(request, page_props['explanation'], ALCHEMY_API_KEY)
                 
-        return d
+        return page_props 
     
     except Exception as e:
         
