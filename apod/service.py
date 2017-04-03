@@ -11,7 +11,7 @@
 from datetime import datetime
 from flask import request, jsonify, render_template, Flask
 from flask_cors import CORS, cross_origin
-from utility import parse_apod, get_concepts 
+from apod.utility import parse_apod, get_concepts 
 import logging
 
 app = Flask(__name__)
