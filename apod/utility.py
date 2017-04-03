@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.WARN)
 #LOG.setLevel(logging.DEBUG)
 
 # location of backing APOD service
-BASE = 'http://apod.nasa.gov/apod/'
+BASE = 'https://apod.nasa.gov/apod/'
 
 def _get_apod_chars(dt):
     
