@@ -49,7 +49,9 @@ def _get_apod_chars(dt):
         
     props['explanation'] = _explanation(soup) 
     props['title'] = _title(soup) 
-    props['copyright'] = _copyright(soup)
+    copyright = _copyright(soup)
+    if copyright:
+        props['copyright'] = copyright
     props['media_type'] = media_type
     props['url'] = data
     
