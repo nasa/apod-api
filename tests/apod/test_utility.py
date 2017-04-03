@@ -1,4 +1,5 @@
-
+#!/bin/sh/python
+# coding= utf-8 
 import unittest
 from apod import utility 
 import logging
