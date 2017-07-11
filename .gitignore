@@ -8,3 +8,5 @@ alchemy_api.key
 lib/
 !lib/README.md
 .DS_Store
+.idea/
+apod/__pycache__/
