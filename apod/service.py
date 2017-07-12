@@ -1,16 +1,19 @@
-''' A micro-service passing back enhanced information from Astronomy 
-    Picture of the Day (APOD).
+"""
+A micro-service passing back enhanced information from Astronomy
+Picture of the Day (APOD).
     
-    Adapted from code in https://github.com/nasa/planetary-api
-    Dec 1, 2015 (written by Dan Hammer) 
+Adapted from code in https://github.com/nasa/planetary-api
+Dec 1, 2015 (written by Dan Hammer)
 
-    @author=danhammer 
-    @author=bathomas @email=brian.a.thomas@nasa.gov
-'''
+@author=danhammer
+@author=bathomas @email=brian.a.thomas@nasa.gov
+@author=jnbetancourt @email=jennifer.n.betancourt@nasa.gov
+"""
 
-from datetime import datetime
+from datetime import datetime, date
+from random import sample
 from flask import request, jsonify, render_template, Flask
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from apod.utility import parse_apod, get_concepts
 import logging
 
@@ -25,7 +28,7 @@ logging.basicConfig(level=logging.DEBUG)
 # assorted libraries
 SERVICE_VERSION = 'v1'
 APOD_METHOD_NAME = 'apod'
-ALLOWED_APOD_FIELDS = ['concept_tags', 'date', 'hd']
+ALLOWED_APOD_FIELDS = ['concept_tags', 'date', 'hd', 'count', 'start_date', 'end_date']
 ALCHEMY_API_KEY = None
 
 try:
@@ -36,7 +39,7 @@ except:
 
 
 def _abort(code, msg, usage=True):
-    if (usage):
+    if usage:
         msg += " " + _usage() + "'"
 
     response = jsonify(service_version=SERVICE_VERSION, msg=msg, code=code)
@@ -59,12 +62,26 @@ def _validate(data):
     return True
 
 
-def _validate_date(dt):
-    LOG.debug("_validate_date(dt) called")
+# TODO(jbetancourt) Convert all datetime objects to dates, then remove this function
+def _validate_datetime(dt):
+    LOG.debug("_validate_datetime(dt) called")
     today = datetime.today()
     begin = datetime(1995, 6, 16)  # first APOD image date
 
     # validate input 
+    if (dt > today) or (dt < begin):
+        today_str = today.strftime('%b %d, %Y')
+        begin_str = begin.strftime('%b %d, %Y')
+
+        raise ValueError('Date must be between %s and %s.' % (begin_str, today_str))
+
+
+def _validate_date(dt):
+    LOG.debug("_validate_date(dt) called")
+    today = datetime.today().date()
+    begin = datetime(1995, 6, 16).date()  # first APOD image date
+
+    # validate input
     if (dt > today) or (dt < begin):
         today_str = today.strftime('%b %d, %Y')
         begin_str = begin.strftime('%b %d, %Y')
@@ -94,15 +111,118 @@ def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False):
         return _abort(500, "Internal Service Error", usage=False)
 
 
+def _get_json_for_date(date, use_concept_tags):
+    """
+    This returns the JSON data for a specific date, which must be a string of the form YYYY-MM-DD. If date is None,
+    then it defaults to the current date.
+    :param date:
+    :param use_concept_tags:
+    :return:
+    """
+    # get the date param
+    use_default_today_date = False
+    if not date:
+        # fall back to using today's date IF they didn't specify a date
+        date = datetime.strftime(datetime.today(), '%Y-%m-%d')
+        use_default_today_date = True
+
+    # validate input date
+    dt = datetime.strptime(date, '%Y-%m-%d')
+    _validate_datetime(dt)
+
+    # get data
+    data = _apod_handler(dt, use_concept_tags, use_default_today_date)
+    data['date'] = date
+    data['service_version'] = SERVICE_VERSION
+
+    # return info as JSON
+    return jsonify(data)
+
+
+def _get_json_for_random_dates(count, use_concept_tags):
+    """
+    This returns the JSON data for a set of randomly chosen dates. The number of dates is specified by the count
+    parameter
+    :param count:
+    :param use_concept_tags:
+    :return:
+    """
+
+    if count > 100 or count <= 0:
+        raise ValueError('Count must be positive and cannot exceed 100')
+
+    begin_ordinal = datetime(1995, 6, 16).toordinal()
+    today_ordinal = datetime.today().toordinal()
+
+    date_range = range(begin_ordinal, today_ordinal + 1)
+    random_date_ordinals = sample(date_range, count)
+
+    all_data = []
+    for date_ordinal in random_date_ordinals:
+        dt = date.fromordinal(date_ordinal)
+        data = _apod_handler(datetime.combine(dt, datetime.min.time()), use_concept_tags,
+                             date_ordinal == today_ordinal)
+        data['date'] = dt.isoformat()
+        data['service_version'] = SERVICE_VERSION
+        all_data.append(data)
+
+    return jsonify(all_data)
+
+
+def _get_json_for_date_range(start_date, end_date, use_concept_tags):
+    """
+    This returns the JSON data for a range of dates, specified by start_date and end_date, which must be strings of the
+    form YYYY-MM-DD. If end_date is None then it defaults to the current date.
+    :param start_date:
+    :param end_date:
+    :param use_concept_tags:
+    :return:
+    """
+    # validate input date
+    start_dt = datetime.strptime(start_date, '%Y-%m-%d').date()
+    _validate_date(start_dt)
+
+    # get the date param
+    if not end_date:
+        # fall back to using today's date IF they didn't specify a date
+        end_date = datetime.strftime(datetime.today(), '%Y-%m-%d')
+
+    # validate input date
+    end_dt = datetime.strptime(end_date, '%Y-%m-%d').date()
+    _validate_date(end_dt)
+
+    start_ordinal = start_dt.toordinal()
+    end_ordinal = end_dt.toordinal()
+    today_ordinal = datetime.today().date().toordinal()
+
+    if start_ordinal > end_ordinal:
+        raise ValueError('start_date cannot be after end_date')
+
+    all_data = []
+
+    while start_ordinal <= end_ordinal:
+        # get data
+        dt = date.fromordinal(start_ordinal)
+        data = _apod_handler(datetime.combine(dt, datetime.min.time()), use_concept_tags,
+                             start_ordinal == today_ordinal)
+        data['date'] = dt.isoformat()
+        data['service_version'] = SERVICE_VERSION
+        all_data.append(data)
+        start_ordinal += 1
+
+    # return info as JSON
+    return jsonify(all_data)
+
+
 #
 # Endpoints
 #
 
 @app.route('/')
 def home():
-    return render_template('home.html', version=SERVICE_VERSION, \
-                           service_url=request.host, \
-                           methodname=APOD_METHOD_NAME, \
+    return render_template('home.html', version=SERVICE_VERSION,
+                           service_url=request.host,
+                           methodname=APOD_METHOD_NAME,
                            usage=_usage(joinstr='", "', prestr='"') + '"')
 
 
@@ -117,28 +237,27 @@ def apod():
         if not _validate(args):
             return _abort(400, "Bad Request incorrect field passed.")
 
-        # get the date param
-        use_default_today_date = False
+        #
         date = args.get('date')
-        if not date:
-            # fall back to using today's date IF they didn't specify a date
-            date = datetime.strftime(datetime.today(), '%Y-%m-%d')
-            use_default_today_date = True
-
-        # grab the concept_tags param
+        count = args.get('count')
+        start_date = args.get('start_date')
+        end_date = args.get('end_date')
         use_concept_tags = args.get('concept_tags', False)
 
-        # validate input date
-        dt = datetime.strptime(date, '%Y-%m-%d')
-        _validate_date(dt)
+        if not count and not start_date and not end_date:
+            return _get_json_for_date(date, use_concept_tags)
 
-        # get data
-        data = _apod_handler(dt, use_concept_tags, use_default_today_date)
-        data['date'] = date
-        data['service_version'] = SERVICE_VERSION
+        elif not date and not start_date and not end_date and count:
+            return _get_json_for_random_dates(int(count), use_concept_tags)
 
-        # return info as JSON
-        return jsonify(data)
+        elif not count and not date and start_date:
+            return _get_json_for_date_range(start_date, end_date, use_concept_tags)
+
+        else:
+            return _abort(400, "Bad Request invalid field combination passed.")
+
+
+
 
     except ValueError as ve:
         return _abort(400, str(ve), False)

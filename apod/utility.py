@@ -1,11 +1,11 @@
-'''
+"""
 Split off some library functions for easier testing and code management.
 
 Created on Mar 24, 2017
 
 @author=bathomas @email=brian.a.thomas@nasa.gov
-'''
-
+"""
+# TODO(jbetancourt) Change double quotes to single quotes for consistency
 from bs4 import BeautifulSoup
 from datetime import timedelta
 import requests
