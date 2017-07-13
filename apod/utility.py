@@ -52,7 +52,7 @@ def _get_apod_chars(dt):
         props['copyright'] = copyright_text
     props['media_type'] = media_type
     props['url'] = data
-    props['date'] = dt.isoformat()
+    props['date'] = dt.date().isoformat()
 
     if hd_data:
         props['hdurl'] = hd_data
