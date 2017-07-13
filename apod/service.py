@@ -135,7 +135,6 @@ def _get_json_for_date(input_date, use_concept_tags):
 
     # get data
     data = _apod_handler(dt, use_concept_tags, use_default_today_date)
-    data['date'] = input_date
     data['service_version'] = SERVICE_VERSION
 
     # return info as JSON
@@ -165,7 +164,6 @@ def _get_json_for_random_dates(count, use_concept_tags):
         dt = date.fromordinal(date_ordinal)
         data = _apod_handler(datetime.combine(dt, datetime.min.time()), use_concept_tags,
                              date_ordinal == today_ordinal)
-        data['date'] = dt.isoformat()
         data['service_version'] = SERVICE_VERSION
         all_data.append(data)
 
@@ -208,9 +206,12 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags):
         dt = date.fromordinal(start_ordinal)
         data = _apod_handler(datetime.combine(dt, datetime.min.time()), use_concept_tags,
                              start_ordinal == today_ordinal)
-        data['date'] = dt.isoformat()
         data['service_version'] = SERVICE_VERSION
-        all_data.append(data)
+
+        if data['date'] == dt.isoformat():
+            # Handles edge case where server is a day ahead of NASA APOD service
+            all_data.append(data)
+
         start_ordinal += 1
 
     # return info as JSON
