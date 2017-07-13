@@ -34,7 +34,7 @@ ALCHEMY_API_KEY = None
 try:
     with open('alchemy_api.key', 'r') as f:
         ALCHEMY_API_KEY = f.read()
-except:
+except FileNotFoundError:
     LOG.info('WARNING: NO alchemy_api.key found, concept_tagging is NOT supported')
 
 
@@ -99,7 +99,7 @@ def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False):
         LOG.debug('managed to get apod page characteristics')
 
         if use_concept_tags:
-            if ALCHEMY_API_KEY == None:
+            if ALCHEMY_API_KEY is None:
                 page_props['concepts'] = 'concept_tags functionality turned off in current service'
             else:
                 page_props['concepts'] = get_concepts(request, page_props['explanation'], ALCHEMY_API_KEY)
@@ -113,28 +113,29 @@ def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False):
         return _abort(500, 'Internal Service Error', usage=False)
 
 
-def _get_json_for_date(date, use_concept_tags):
+def _get_json_for_date(input_date, use_concept_tags):
     """
     This returns the JSON data for a specific date, which must be a string of the form YYYY-MM-DD. If date is None,
     then it defaults to the current date.
-    :param date:
+    :param input_date:
     :param use_concept_tags:
     :return:
     """
+
     # get the date param
     use_default_today_date = False
-    if not date:
+    if not input_date:
         # fall back to using today's date IF they didn't specify a date
-        date = datetime.strftime(datetime.today(), '%Y-%m-%d')
+        input_date = datetime.strftime(datetime.today(), '%Y-%m-%d')
         use_default_today_date = True
 
     # validate input date
-    dt = datetime.strptime(date, '%Y-%m-%d')
+    dt = datetime.strptime(input_date, '%Y-%m-%d')
     _validate_datetime(dt)
 
     # get data
     data = _apod_handler(dt, use_concept_tags, use_default_today_date)
-    data['date'] = date
+    data['date'] = input_date
     data['service_version'] = SERVICE_VERSION
 
     # return info as JSON
@@ -237,29 +238,26 @@ def apod():
         args = request.args
 
         if not _validate(args):
-            return _abort(400, 'Bad Request incorrect field passed.')
+            return _abort(400, 'Bad Request: incorrect field passed.')
 
         #
-        date = args.get('date')
+        input_date = args.get('date')
         count = args.get('count')
         start_date = args.get('start_date')
         end_date = args.get('end_date')
         use_concept_tags = args.get('concept_tags', False)
 
         if not count and not start_date and not end_date:
-            return _get_json_for_date(date, use_concept_tags)
+            return _get_json_for_date(input_date, use_concept_tags)
 
-        elif not date and not start_date and not end_date and count:
+        elif not input_date and not start_date and not end_date and count:
             return _get_json_for_random_dates(int(count), use_concept_tags)
 
-        elif not count and not date and start_date:
+        elif not count and not input_date and start_date:
             return _get_json_for_date_range(start_date, end_date, use_concept_tags)
 
         else:
-            return _abort(400, 'Bad Request invalid field combination passed.')
-
-
-
+            return _abort(400, 'Bad Request: invalid field combination passed.')
 
     except ValueError as ve:
         return _abort(400, str(ve), False)
@@ -279,6 +277,7 @@ def page_not_found(e):
     """
     Return a custom 404 error.
     """
+    LOG.info('Invalid page request: ' + e)
     return _abort(404, 'Sorry, Nothing at this URL.', usage=True)
 
 
@@ -287,7 +286,7 @@ def application_error(e):
     """
     Return a custom 500 error.
     """
-    return _abort('Sorry, unexpected error: {}'.format(e), usage=False)
+    return _abort(500, 'Sorry, unexpected error: {}'.format(e), usage=False)
 
 
 if __name__ == '__main__':

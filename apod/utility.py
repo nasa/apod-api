@@ -27,7 +27,6 @@ def _get_apod_chars(dt):
     LOG.debug('OPENING URL:' + apod_url)
     soup = BeautifulSoup(requests.get(apod_url).text, 'html.parser')
     LOG.debug('getting the data url')
-    data = None
     hd_data = None
     if soup.img:
         # it is an image, so get both the low- and high-resolution data
@@ -48,9 +47,9 @@ def _get_apod_chars(dt):
 
     props['explanation'] = _explanation(soup)
     props['title'] = _title(soup)
-    copyright = _copyright(soup)
-    if copyright:
-        props['copyright'] = copyright
+    copyright_text = _copyright(soup)
+    if copyright_text:
+        props['copyright'] = copyright_text
     props['media_type'] = media_type
     props['url'] = data
 
@@ -92,20 +91,20 @@ def _copyright(soup):
         # There's no uniform handling of copyright (sigh). Well, we just have to 
         # try every stinking text block we find...
 
-        copyright = None
+        copyright_text = None
         use_next = False
         for element in soup.findAll('a', text=True):
             # LOG.debug("TEXT: "+element.text)
 
             if use_next:
-                copyright = element.text.strip(' ')
+                copyright_text = element.text.strip(' ')
                 break
 
             if 'Copyright' in element.text:
                 LOG.debug('Found Copyright text:' + str(element.text))
                 use_next = True
 
-        if not copyright:
+        if not copyright_text:
 
             for element in soup.findAll(['b', 'a'], text=True):
                 # LOG.debug("TEXT: "+element.text)
@@ -116,7 +115,7 @@ def _copyright(soup):
                     # which follows
                     sibling = element.next_sibling
                     stuff = ""
-                    while (sibling):
+                    while sibling:
                         try:
                             stuff = stuff + sibling.text
                         except Exception:
@@ -124,16 +123,13 @@ def _copyright(soup):
                         sibling = sibling.next_sibling
 
                     if stuff:
-                        copyright = stuff.strip(' ')
+                        copyright_text = stuff.strip(' ')
 
-        return copyright
+        return copyright_text
 
     except Exception as ex:
         LOG.error(str(ex))
         raise ValueError('Unsupported schema for given date.')
-
-    # NO stated copyright, so we return None
-    return None
 
 
 def _explanation(soup):
@@ -154,7 +150,7 @@ def _explanation(soup):
         texts = [x.strip() for x in soup.text.split('\n')]
         begin_idx = texts.index('Explanation:') + 1
         idx = texts[begin_idx:].index('')
-        s = (' ').join(texts[begin_idx:begin_idx + idx])
+        s = ' '.join(texts[begin_idx:begin_idx + idx])
     return s
 
 
