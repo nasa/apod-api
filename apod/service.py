@@ -35,7 +35,7 @@ try:
     with open('alchemy_api.key', 'r') as f:
         ALCHEMY_API_KEY = f.read()
 except:
-    LOG.info("WARNING: NO alchemy_api.key found, concept_tagging is NOT supported")
+    LOG.info('WARNING: NO alchemy_api.key found, concept_tagging is NOT supported')
 
 
 def _abort(code, msg, usage=True):
@@ -50,12 +50,12 @@ def _abort(code, msg, usage=True):
 
 
 def _usage(joinstr="', '", prestr="'"):
-    return "Allowed request fields for " + APOD_METHOD_NAME + " method are " + prestr + joinstr.join(
+    return 'Allowed request fields for ' + APOD_METHOD_NAME + ' method are ' + prestr + joinstr.join(
         ALLOWED_APOD_FIELDS)
 
 
 def _validate(data):
-    LOG.debug("_validate(data) called")
+    LOG.debug('_validate(data) called')
     for key in data:
         if key not in ALLOWED_APOD_FIELDS:
             return False
@@ -64,7 +64,7 @@ def _validate(data):
 
 # TODO(jbetancourt) Convert all datetime objects to dates, then remove this function
 def _validate_datetime(dt):
-    LOG.debug("_validate_datetime(dt) called")
+    LOG.debug('_validate_datetime(dt) called')
     today = datetime.today()
     begin = datetime(1995, 6, 16)  # first APOD image date
 
@@ -77,7 +77,7 @@ def _validate_datetime(dt):
 
 
 def _validate_date(dt):
-    LOG.debug("_validate_date(dt) called")
+    LOG.debug('_validate_date(dt) called')
     today = datetime.today().date()
     begin = datetime(1995, 6, 16).date()  # first APOD image date
 
@@ -90,15 +90,17 @@ def _validate_date(dt):
 
 
 def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False):
-    """Accepts a parameter dictionary. Returns the response object to be
-    served through the API."""
+    """
+    Accepts a parameter dictionary. Returns the response object to be
+    served through the API.
+    """
     try:
         page_props = parse_apod(dt, use_default_today_date)
-        LOG.debug("managed to get apod page characteristics")
+        LOG.debug('managed to get apod page characteristics')
 
         if use_concept_tags:
             if ALCHEMY_API_KEY == None:
-                page_props['concepts'] = "concept_tags functionality turned off in current service"
+                page_props['concepts'] = 'concept_tags functionality turned off in current service'
             else:
                 page_props['concepts'] = get_concepts(request, page_props['explanation'], ALCHEMY_API_KEY)
 
@@ -106,9 +108,9 @@ def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False):
 
     except Exception as e:
 
-        LOG.error("Internal Service Error :" + str(type(e)) + " msg:" + str(e))
+        LOG.error('Internal Service Error :' + str(type(e)) + ' msg:' + str(e))
         # return code 500 here
-        return _abort(500, "Internal Service Error", usage=False)
+        return _abort(500, 'Internal Service Error', usage=False)
 
 
 def _get_json_for_date(date, use_concept_tags):
@@ -228,14 +230,14 @@ def home():
 
 @app.route('/' + SERVICE_VERSION + '/' + APOD_METHOD_NAME + '/', methods=['GET'])
 def apod():
-    LOG.info("apod path called")
+    LOG.info('apod path called')
     try:
 
         # application/json GET method 
         args = request.args
 
         if not _validate(args):
-            return _abort(400, "Bad Request incorrect field passed.")
+            return _abort(400, 'Bad Request incorrect field passed.')
 
         #
         date = args.get('date')
@@ -254,7 +256,7 @@ def apod():
             return _get_json_for_date_range(start_date, end_date, use_concept_tags)
 
         else:
-            return _abort(400, "Bad Request invalid field combination passed.")
+            return _abort(400, 'Bad Request invalid field combination passed.')
 
 
 
@@ -265,22 +267,26 @@ def apod():
     except Exception as ex:
 
         etype = type(ex)
-        if etype == ValueError or "BadRequest" in str(etype):
+        if etype == ValueError or 'BadRequest' in str(etype):
             return _abort(400, str(ex) + ".")
         else:
-            LOG.error("Service Exception. Msg: " + str(type(ex)))
-            return _abort(500, "Internal Service Error", usage=False)
+            LOG.error('Service Exception. Msg: ' + str(type(ex)))
+            return _abort(500, 'Internal Service Error', usage=False)
 
 
 @app.errorhandler(404)
 def page_not_found(e):
-    """Return a custom 404 error."""
-    return _abort(404, "Sorry, Nothing at this URL.", usage=True)
+    """
+    Return a custom 404 error.
+    """
+    return _abort(404, 'Sorry, Nothing at this URL.', usage=True)
 
 
 @app.errorhandler(500)
 def application_error(e):
-    """Return a custom 500 error."""
+    """
+    Return a custom 500 error.
+    """
     return _abort('Sorry, unexpected error: {}'.format(e), usage=False)
 
 

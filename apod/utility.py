@@ -5,7 +5,7 @@ Created on Mar 24, 2017
 
 @author=bathomas @email=brian.a.thomas@nasa.gov
 """
-# TODO(jbetancourt) Change double quotes to single quotes for consistency
+
 from bs4 import BeautifulSoup
 from datetime import timedelta
 import requests
@@ -24,9 +24,9 @@ def _get_apod_chars(dt):
     media_type = 'image'
     date_str = dt.strftime('%y%m%d')
     apod_url = '%sap%s.html' % (BASE, date_str)
-    LOG.debug("OPENING URL:" + apod_url)
-    soup = BeautifulSoup(requests.get(apod_url).text, "html.parser")
-    LOG.debug("getting the data url")
+    LOG.debug('OPENING URL:' + apod_url)
+    soup = BeautifulSoup(requests.get(apod_url).text, 'html.parser')
+    LOG.debug('getting the data url')
     data = None
     hd_data = None
     if soup.img:
@@ -34,9 +34,9 @@ def _get_apod_chars(dt):
         data = BASE + soup.img['src']
         hd_data = data
 
-        LOG.debug("getting the link for hd_data")
+        LOG.debug('getting the link for hd_data')
         for link in soup.find_all('a', href=True):
-            if link['href'] and link['href'].startswith("image"):
+            if link['href'] and link['href'].startswith('image'):
                 hd_data = BASE + link['href']
                 break
     else:
@@ -61,10 +61,12 @@ def _get_apod_chars(dt):
 
 
 def _title(soup):
-    """Accepts a BeautifulSoup object for the APOD HTML page and returns the
+    """
+    Accepts a BeautifulSoup object for the APOD HTML page and returns the
     APOD image title.  Highly idiosyncratic with adaptations for different
-    HTML structures that appear over time."""
-    LOG.debug("getting the title")
+    HTML structures that appear over time.
+    """
+    LOG.debug('getting the title')
     try:
         # Handler for later APOD entries
         center_selection = soup.find_all('center')[1]
@@ -79,13 +81,14 @@ def _title(soup):
 
 
 def _copyright(soup):
-    """Accepts a BeautifulSoup object for the APOD HTML page and returns the
+    """
+    Accepts a BeautifulSoup object for the APOD HTML page and returns the
     APOD image copyright.  Highly idiosyncratic with adaptations for different
-    HTML structures that appear over time."""
-    LOG.debug("getting the copyright")
+    HTML structures that appear over time.
+    """
+    LOG.debug('getting the copyright')
     try:
         # Handler for later APOD entries
-
         # There's no uniform handling of copyright (sigh). Well, we just have to 
         # try every stinking text block we find...
 
@@ -98,8 +101,8 @@ def _copyright(soup):
                 copyright = element.text.strip(' ')
                 break
 
-            if "Copyright" in element.text:
-                LOG.debug("Found Copyright text:" + str(element.text))
+            if 'Copyright' in element.text:
+                LOG.debug('Found Copyright text:' + str(element.text))
                 use_next = True
 
         if not copyright:
@@ -107,8 +110,8 @@ def _copyright(soup):
             for element in soup.findAll(['b', 'a'], text=True):
                 # LOG.debug("TEXT: "+element.text)
                 # search text for explicit match
-                if "Copyright" in element.text:
-                    LOG.debug("Found Copyright text:" + str(element.text))
+                if 'Copyright' in element.text:
+                    LOG.debug('Found Copyright text:' + str(element.text))
                     # pull the copyright from the link text
                     # which follows
                     sibling = element.next_sibling
@@ -134,10 +137,12 @@ def _copyright(soup):
 
 
 def _explanation(soup):
-    """Accepts a BeautifulSoup object for the APOD HTML page and returns the
-    APOD image explanation.  Highly idiosyncratic."""
+    """
+    Accepts a BeautifulSoup object for the APOD HTML page and returns the
+    APOD image explanation.  Highly idiosyncratic.
+    """
     # Handler for later APOD entries
-    LOG.debug("getting the explanation")
+    LOG.debug('getting the explanation')
     s = soup.find_all('p')[2].text
     s = s.replace('\n', ' ')
     s = s.replace('  ', ' ')
@@ -154,10 +159,12 @@ def _explanation(soup):
 
 
 def parse_apod(dt, use_default_today_date=False):
-    """Accepts a date in '%Y-%m-%d' format. Returns the URL of the APOD image
-    of that day, noting that """
+    """
+    Accepts a date in '%Y-%m-%d' format. Returns the URL of the APOD image
+    of that day, noting that
+    """
 
-    LOG.debug("apod chars called date:" + str(dt))
+    LOG.debug('apod chars called date:' + str(dt))
 
     try:
         return _get_apod_chars(dt)
@@ -180,8 +187,10 @@ def parse_apod(dt, use_default_today_date=False):
 
 
 def get_concepts(request, text, apikey):
-    """Returns the concepts associated with the text, interleaved with integer
-    keys indicating the index."""
+    """
+    Returns the concepts associated with the text, interleaved with integer
+    keys indicating the index.
+    """
     cbase = 'http://access.alchemyapi.com/calls/text/TextGetRankedConcepts'
 
     params = dict(
@@ -192,7 +201,7 @@ def get_concepts(request, text, apikey):
 
     try:
 
-        LOG.debug("Getting response")
+        LOG.debug('Getting response')
         response = json.loads(request.get(cbase, fields=params))
         clist = [concept['text'] for concept in response['concepts']]
         return {k: v for k, v in zip(range(len(clist)), clist)}
