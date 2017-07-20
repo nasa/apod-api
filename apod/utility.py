@@ -149,7 +149,19 @@ def _explanation(soup):
     if s == '':
         # Handler for earlier APOD entries
         texts = [x.strip() for x in soup.text.split('\n')]
-        begin_idx = texts.index('Explanation:') + 1
+        try:
+            begin_idx = texts.index('Explanation:') + 1
+        except ValueError as e:
+            # Rare case where "Explanation:" is not on its own line
+            explanation_line = [x for x in texts if "Explanation:" in x]
+            if len(explanation_line) == 1:
+                begin_idx = texts.index(explanation_line[0])
+                texts[begin_idx] = texts[begin_idx][12:].strip()
+            else:
+                raise e
+
+
+
         idx = texts[begin_idx:].index('')
         s = ' '.join(texts[begin_idx:begin_idx + idx])
     return s
