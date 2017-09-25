@@ -22,7 +22,6 @@ CORS(app)
 
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
-# LOG.setLevel(logging.DEBUG)
 
 # this should reflect both this service and the backing 
 # assorted libraries
@@ -60,20 +59,6 @@ def _validate(data):
         if key not in ALLOWED_APOD_FIELDS:
             return False
     return True
-
-
-# TODO(jbetancourt) Convert all datetime objects to dates, then remove this function
-def _validate_datetime(dt):
-    LOG.debug('_validate_datetime(dt) called')
-    today = datetime.today()
-    begin = datetime(1995, 6, 16)  # first APOD image date
-
-    # validate input 
-    if (dt > today) or (dt < begin):
-        today_str = today.strftime('%b %d, %Y')
-        begin_str = begin.strftime('%b %d, %Y')
-
-        raise ValueError('Date must be between %s and %s.' % (begin_str, today_str))
 
 
 def _validate_date(dt):
@@ -130,8 +115,8 @@ def _get_json_for_date(input_date, use_concept_tags):
         use_default_today_date = True
 
     # validate input date
-    dt = datetime.strptime(input_date, '%Y-%m-%d')
-    _validate_datetime(dt)
+    dt = datetime.strptime(input_date, '%Y-%m-%d').date()
+    _validate_date(dt)
 
     # get data
     data = _apod_handler(dt, use_concept_tags, use_default_today_date)
@@ -162,8 +147,7 @@ def _get_json_for_random_dates(count, use_concept_tags):
     all_data = []
     for date_ordinal in random_date_ordinals:
         dt = date.fromordinal(date_ordinal)
-        data = _apod_handler(datetime.combine(dt, datetime.min.time()), use_concept_tags,
-                             date_ordinal == today_ordinal)
+        data = _apod_handler(dt, use_concept_tags, date_ordinal == today_ordinal)
         data['service_version'] = SERVICE_VERSION
         all_data.append(data)
 
@@ -204,8 +188,7 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags):
     while start_ordinal <= end_ordinal:
         # get data
         dt = date.fromordinal(start_ordinal)
-        data = _apod_handler(datetime.combine(dt, datetime.min.time()), use_concept_tags,
-                             start_ordinal == today_ordinal)
+        data = _apod_handler(dt, use_concept_tags, start_ordinal == today_ordinal)
         data['service_version'] = SERVICE_VERSION
 
         if data['date'] == dt.isoformat():

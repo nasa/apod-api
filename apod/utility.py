@@ -14,7 +14,6 @@ import json
 
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARN)
-# LOG.setLevel(logging.DEBUG)
 
 # location of backing APOD service
 BASE = 'https://apod.nasa.gov/apod/'
@@ -52,7 +51,7 @@ def _get_apod_chars(dt):
         props['copyright'] = copyright_text
     props['media_type'] = media_type
     props['url'] = data
-    props['date'] = dt.date().isoformat()
+    props['date'] = dt.isoformat()
 
     if hd_data:
         props['hdurl'] = hd_data
@@ -76,8 +75,6 @@ def _title(soup):
         # Handler for early APOD entries
         text = soup.title.text.split(' - ')[-1]
         return text.strip()
-    else:
-        raise ValueError('Unsupported schema for given date.')
 
 
 def _copyright(soup):
@@ -108,12 +105,10 @@ def _copyright(soup):
         if not copyright_text:
 
             for element in soup.findAll(['b', 'a'], text=True):
-                # LOG.debug("TEXT: "+element.text)
                 # search text for explicit match
                 if 'Copyright' in element.text:
                     LOG.debug('Found Copyright text:' + str(element.text))
-                    # pull the copyright from the link text
-                    # which follows
+                    # pull the copyright from the link text which follows
                     sibling = element.next_sibling
                     stuff = ""
                     while sibling:
@@ -159,8 +154,6 @@ def _explanation(soup):
                 texts[begin_idx] = texts[begin_idx][12:].strip()
             else:
                 raise e
-
-
 
         idx = texts[begin_idx:].index('')
         s = ' '.join(texts[begin_idx:begin_idx + idx])
