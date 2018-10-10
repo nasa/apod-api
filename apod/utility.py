@@ -4,6 +4,9 @@ Split off some library functions for easier testing and code management.
 Created on Mar 24, 2017
 
 @author=bathomas @email=brian.a.thomas@nasa.gov
+
+Modified on Oct 10, 2018
+@author=PawelPleskaczynski @email=pawelpleskaczynski@gmail.com
 """
 
 from bs4 import BeautifulSoup
@@ -37,10 +40,14 @@ def _get_apod_chars(dt):
             if link['href'] and link['href'].startswith('image'):
                 hd_data = BASE + link['href']
                 break
-    else:
+    elif soup.iframe:
         # its a video
         media_type = 'video'
         data = soup.iframe['src']
+    else:
+        # it is neither image nor video, output empty urls
+        media_type = 'other'
+        data = ''
 
     props = {}
 
@@ -50,7 +57,8 @@ def _get_apod_chars(dt):
     if copyright_text:
         props['copyright'] = copyright_text
     props['media_type'] = media_type
-    props['url'] = data
+    if data:
+        props['url'] = data
     props['date'] = dt.isoformat()
 
     if hd_data:
