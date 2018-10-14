@@ -89,7 +89,8 @@ def _get_apod_chars(dt, thumbs):
         props['hdurl'] = hd_data
 
     if thumbs and media_type == "video":
-        props['thumbnail_url'] = _get_thumbs(data)
+        if thumbs.lower() == "true":
+            props['thumbnail_url'] = _get_thumbs(data)
 
     return props
 
