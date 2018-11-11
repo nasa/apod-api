@@ -224,7 +224,6 @@ def apod():
         if not _validate(args):
             return _abort(400, 'Bad Request: incorrect field passed.')
 
-        #
         input_date = args.get('date')
         count = args.get('count')
         start_date = args.get('start_date')
