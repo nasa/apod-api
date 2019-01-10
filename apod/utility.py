@@ -11,6 +11,8 @@ from datetime import timedelta
 import requests
 import logging
 import json
+import re
+import urllib.request
 
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARN)
@@ -19,7 +21,32 @@ logging.basicConfig(level=logging.WARN)
 BASE = 'https://apod.nasa.gov/apod/'
 
 
-def _get_apod_chars(dt):
+# function for getting video thumbnails
+def _get_thumbs(data):
+    global video_thumb
+    if "youtube" in data or "youtu.be" in data:
+        # get ID from YouTube URL
+        youtube_id_regex = re.compile("(?:(?<=(v|V)/)|(?<=be/)|(?<=(\?|\&)v=)|(?<=embed/))([\w-]+)")
+        video_id = youtube_id_regex.findall(data)
+        video_id = ''.join(''.join(elements) for elements in video_id).replace("?", "").replace("&", "")
+        # get URL of thumbnail
+        video_thumb = "https://img.youtube.com/vi/" + video_id + "/0.jpg"
+    elif "vimeo" in data:
+        # get ID from Vimeo URL
+        vimeo_id_regex = re.compile("(?:/video/)(\d+)")
+        vimeo_id = vimeo_id_regex.findall(data)[0]
+        # make an API call to get thumbnail URL
+        with urllib.request.urlopen("https://vimeo.com/api/v2/video/" + vimeo_id + ".json") as url:
+            data = json.loads(url.read().decode())
+            video_thumb = data[0]['thumbnail_large']
+    else:
+        # the thumbs parameter is True, but the APOD for the date is not a video, output nothing
+        video_thumb = ""
+
+    return video_thumb
+
+
+def _get_apod_chars(dt, thumbs):
     media_type = 'image'
     date_str = dt.strftime('%y%m%d')
     apod_url = '%sap%s.html' % (BASE, date_str)
@@ -37,10 +64,14 @@ def _get_apod_chars(dt):
             if link['href'] and link['href'].startswith('image'):
                 hd_data = BASE + link['href']
                 break
-    else:
+    elif soup.iframe:
         # its a video
         media_type = 'video'
         data = soup.iframe['src']
+    else:
+        # it is neither image nor video, output empty urls
+        media_type = 'other'
+        data = ''
 
     props = {}
 
@@ -50,11 +81,16 @@ def _get_apod_chars(dt):
     if copyright_text:
         props['copyright'] = copyright_text
     props['media_type'] = media_type
-    props['url'] = data
+    if data:
+        props['url'] = data
     props['date'] = dt.isoformat()
 
     if hd_data:
         props['hdurl'] = hd_data
+
+    if thumbs and media_type == "video":
+        if thumbs.lower() == "true":
+            props['thumbnail_url'] = _get_thumbs(data)
 
     return props
 
@@ -86,7 +122,7 @@ def _copyright(soup):
     LOG.debug('getting the copyright')
     try:
         # Handler for later APOD entries
-        # There's no uniform handling of copyright (sigh). Well, we just have to 
+        # There's no uniform handling of copyright (sigh). Well, we just have to
         # try every stinking text block we find...
 
         copyright_text = None
@@ -160,7 +196,7 @@ def _explanation(soup):
     return s
 
 
-def parse_apod(dt, use_default_today_date=False):
+def parse_apod(dt, use_default_today_date=False, thumbs=False):
     """
     Accepts a date in '%Y-%m-%d' format. Returns the URL of the APOD image
     of that day, noting that
@@ -169,19 +205,19 @@ def parse_apod(dt, use_default_today_date=False):
     LOG.debug('apod chars called date:' + str(dt))
 
     try:
-        return _get_apod_chars(dt)
+        return _get_apod_chars(dt, thumbs)
 
     except Exception as ex:
 
         # handle edge case where the service local time
         # miss-matches with 'todays date' of the underlying APOD
         # service (can happen because they are deployed in different
-        # timezones). Use the fallback of prior day's date 
+        # timezones). Use the fallback of prior day's date
 
         if use_default_today_date:
             # try to get the day before
             dt = dt - timedelta(days=1)
-            return _get_apod_chars(dt)
+            return _get_apod_chars(dt, thumbs)
         else:
             # pass exception up the call stack
             LOG.error(str(ex))
