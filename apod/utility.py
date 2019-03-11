@@ -106,11 +106,23 @@ def _title(soup):
         # Handler for later APOD entries
         center_selection = soup.find_all('center')[1]
         bold_selection = center_selection.find_all('b')[0]
-        return bold_selection.text.strip(' ')
+        title = bold_selection.text.strip(' ')
+        try:
+            title = title.encode('latin1').decode('cp1252')
+        except Exception as ex:
+            LOG.error(str(ex))
+        
+        return title
     except Exception:
         # Handler for early APOD entries
         text = soup.title.text.split(' - ')[-1]
-        return text.strip()
+        title = text.strip()
+        try:
+            title = title.encode('latin1').decode('cp1252')
+        except Exception as ex:
+            LOG.error(str(ex))
+
+        return title
 
 
 def _copyright(soup):
@@ -156,6 +168,10 @@ def _copyright(soup):
 
                     if stuff:
                         copyright_text = stuff.strip(' ')
+        try:
+            copyright_text = copyright_text.encode('latin1').decode('cp1252')
+        except Exception as ex:
+            LOG.error(str(ex))
 
         return copyright_text
 
@@ -193,6 +209,12 @@ def _explanation(soup):
 
         idx = texts[begin_idx:].index('')
         s = ' '.join(texts[begin_idx:begin_idx + idx])
+
+    try:
+        s = s.encode('latin1').decode('cp1252')
+    except Exception as ex:
+        LOG.error(str(ex))
+
     return s
 
 
