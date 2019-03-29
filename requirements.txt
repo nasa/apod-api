@@ -6,8 +6,8 @@
 # Note: The `lib` directory is added to `sys.path` by `appengine_config.py`.
 Flask-Cors==2.1.2
 gunicorn==19.5.0
-Jinja2==2.8
-Werkzeug==0.10.4
+Jinja2>=2.8
+Werkzeug>=0.10.4
 beautifulsoup4==4.5.3
 requests>=2.20.0
 coverage==4.1
