@@ -21,56 +21,86 @@ Engine with the [Flask micro framework](http://flask.pocoo.org).
 ```bash
 git clone https://github.com/nasa/apod-api
 ```
-<br/><br/>
+<br/>
 2. `cd` into the new directory
-`cd apod-api`
+```bash
+cd apod-api
+```
 <br/>
 3. Install dependencies into the project's `lib`
-`pip install -r requirements.txt -t lib`
-
+```bash
+pip install -r requirements.txt -t lib
+```
+<br/>
 4. Add `lib` to your PYTHONPATH and run the server
-`PYTHONPATH=./lib python apod/service.py`
-
+```bash
+PYTHONPATH=./lib python apod/service.py
+```
+<br/>
 ### `virtualenv` environment <a name="virtualenv"></a>
 
 1. Clone the rep
-`git clone https://github.com/nasa/apod-api`
-
+```bash
+git clone https://github.com/nasa/apod-api
+```
+<br/>
 2. `cd` into the new directory
-`cd apod-api`
-
+```bash
+cd apod-api
+```
+<br/>
 3. Create a new virtual environment `env` in the directory
-`python -m virtualenv env`
-
+```bash
+python -m virtualenv env
+```
+<br/>
 4. Activate the new environment
-`source env/bin/activate`
-
+```bash
+source env/bin/activate
+```
+<br/>
 5. Install dependencies in new environment
-`pip install -r requirements.txt`
-
+```bash
+pip install -r requirements.txt
+```
+<br/>
 6. Run the server locally
-`python apod/service.py`
-
+```bash
+python apod/service.py
+```
+<br/>
 ### `conda` environment <a name="conda"></a>
 
 1. Clone the repo
-`git clone https://github.com/nasa/apod-api`
-
+```bash
+git clone https://github.com/nasa/apod-api
+```
+<br/>
 2. `cd` into the new directory
-`cd apod-api`
-
+```bash
+cd apod-api
+```
+<br/>
 3. Create a new virtual environment `env` in the directory
-`conda create --prefix ./env python=2.7`
-
+```bash
+conda create --prefix ./env python=2.7
+```
+<br/>
 4. Activate the new environment
-`conda activate ./env`
-
+```bash
+conda activate ./env
+```
+<br/>
 5. Install dependencies in new environment
-`pip install -r requirements.txt`
-
+```bash
+pip install -r requirements.txt
+```
+<br/>
 6. Run the server locally
-`python apod/service.py`
-
+```bash
+python apod/service.py
+```
+<br/>
 ## Docs <a name="docs"></a>
 
 ### Endpoint: `/<version>/apod`
