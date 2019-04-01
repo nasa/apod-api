@@ -9,12 +9,14 @@ Dec 1, 2015 (written by Dan Hammer)
 @author=bathomas @email=brian.a.thomas@nasa.gov
 @author=jnbetancourt @email=jennifer.n.betancourt@nasa.gov
 """
+import sys
+sys.path.insert(0, "../lib")
 
 from datetime import datetime, date
 from random import sample
 from flask import request, jsonify, render_template, Flask
 from flask_cors import CORS
-from apod.utility import parse_apod, get_concepts
+from utility import parse_apod, get_concepts
 import logging
 
 app = Flask(__name__)
