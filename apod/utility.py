@@ -12,7 +12,8 @@ import requests
 import logging
 import json
 import re
-import urllib.request
+import urllib3 as urllib
+# import urllib.request
 
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARN)
