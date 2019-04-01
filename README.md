@@ -29,7 +29,6 @@ cd apod-api
 ```bash
 pip install -r requirements.txt -t lib
 ```
-&nbsp;
 4. Add `lib` to your PYTHONPATH and run the server
 ```bash
 PYTHONPATH=./lib python apod/service.py
@@ -61,6 +60,7 @@ pip install -r requirements.txt
 ```bash
 python apod/service.py
 ```
+&nbsp;
 ### `conda` environment <a name="conda"></a>
 
 1. Clone the repo
