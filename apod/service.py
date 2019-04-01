@@ -35,8 +35,9 @@ ALCHEMY_API_KEY = None
 try:
     with open('alchemy_api.key', 'r') as f:
         ALCHEMY_API_KEY = f.read()
-except FileNotFoundError:
-    LOG.info('WARNING: NO alchemy_api.key found, concept_tagging is NOT supported')
+#except FileNotFoundError:
+except IOError:
+     LOG.info('WARNING: NO alchemy_api.key found, concept_tagging is NOT supported')
 
 
 def _abort(code, msg, usage=True):
