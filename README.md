@@ -20,19 +20,19 @@ Engine with the [Flask micro framework](http://flask.pocoo.org).
 1. Clone the repo
 ```bash
 git clone https://github.com/nasa/apod-api
-```<br>
+```
 2. `cd` into the new directory
 ```bash
 cd apod-api
-```<br>
+```
 3. Install dependencies into the project's `lib`
 ```bash
 pip install -r requirements.txt -t lib
-```<br>
+```
 4. Add `lib` to your PYTHONPATH and run the server
 ```bash
 PYTHONPATH=./lib python apod/service.py
-```<br>
+```
 
 ### `virtualenv` environment <a name="virtualenv"></a>
 
@@ -40,64 +40,57 @@ PYTHONPATH=./lib python apod/service.py
 ```bash
 git clone https://github.com/nasa/apod-api
 ```
-<br/>
 2. `cd` into the new directory
 ```bash
 cd apod-api
 ```
-<br/>
 3. Create a new virtual environment `env` in the directory
 ```bash
 python -m virtualenv env
 ```
-<br/>
 4. Activate the new environment
 ```bash
 source env/bin/activate
 ```
-<br/>
 5. Install dependencies in new environment
 ```bash
 pip install -r requirements.txt
 ```
-<br/>
 6. Run the server locally
 ```bash
 python apod/service.py
 ```
-<br/>
 ### `conda` environment <a name="conda"></a>
 
 1. Clone the repo
 ```bash
 git clone https://github.com/nasa/apod-api
 ```
-<br/>
 2. `cd` into the new directory
 ```bash
 cd apod-api
 ```
-<br/>
 3. Create a new virtual environment `env` in the directory
 ```bash
 conda create --prefix ./env python=2.7
 ```
-<br/>
 4. Activate the new environment
 ```bash
 conda activate ./env
 ```
-<br/>
 5. Install dependencies in new environment
 ```bash
 pip install -r requirements.txt
 ```
-<br/>
+
+
+
+
+
 6. Run the server locally
 ```bash
 python apod/service.py
 ```
-<br/>
 ## Docs <a name="docs"></a>
 
 ### Endpoint: `/<version>/apod`
