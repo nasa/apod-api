@@ -18,7 +18,9 @@ Engine with the [Flask micro framework](http://flask.pocoo.org).
 ### Standard environment <a name="standard_env"></a>
 
 1. Clone the repo
-`git clone https://github.com/nasa/apod-api`
+```bash
+git clone https://github.com/nasa/apod-api
+```
 
 2. `cd` into the new directory
 `cd apod-api`
