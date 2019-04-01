@@ -33,7 +33,7 @@ pip install -r requirements.txt -t lib
 ```bash
 PYTHONPATH=./lib python apod/service.py
 ```
-</br>
+<br/>
 ### `virtualenv` environment <a name="virtualenv"></a>
 
 1. Clone the rep
