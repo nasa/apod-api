@@ -5,7 +5,7 @@ Engine with the [Flask micro framework](http://flask.pocoo.org).
 
 # Table of contents
 1. [Getting Started](#getting_started)
-    1. [Standard Environment](#standard_env)
+    1. [Standard environment](#standard_env)
     2. [`virtualenv` environment](#virtualenv)
     3. [`conda` environment](#conda)
 2. [Docs](#docs)
