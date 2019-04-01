@@ -14,7 +14,7 @@ Engine with the [Flask micro framework](http://flask.pocoo.org).
 
 
 ## Getting started <a name="getting_started"></a>
-
+&nbsp;
 ### Standard environment <a name="standard_env"></a>
 
 1. Clone the repo
