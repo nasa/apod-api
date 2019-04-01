@@ -3,8 +3,68 @@
 A microservice written in Python which may be run on Google App 
 Engine with the [Flask micro framework](http://flask.pocoo.org).
 
+# Table of contents
+1. [Getting Started](#getting_started)
+    1. [Standard Environment](#standard_env)
+    2. [`virtualenv` environment](#virtualenv)
+    3. [`conda` environment](#conda)
+2. [Docs](#docs)
+3. [Feedback](#feedback)
+4. [Author](#author)
 
-## Endpoint: `/<version>/apod`
+
+## Getting started <a name="getting_started"></a>
+
+1. Install the [App Engine Python SDK](https://developers.google.com/appengine/downloads).
+
+This API runs on Google App Engine.  It's not an easy development environment, especially when compared against to lightweight Flask APIs.  But scaling in production is amazingly simple.  The setup is non-trivial but it's worth it.  
+
+I would encourage installing App Engine via [Google Cloud SDK](https://cloud.google.com/sdk/).  It's included in the install.
+```bash
+curl https://sdk.cloud.google.com | bash
+```
+Follow the install prompts at the command line and then restart your terminal (or just `source .bash_profile` or `source .bashrc`).  Then type the following to authenticate.
+```bash
+gcloud auth login
+```
+
+See the README file for directions. 
+You'll need python 2.7 and [pip 1.4 or later](http://www.pip-installer.org/en/latest/installing.html) installed too..
+
+2. Clone this repo with
+
+   ```
+   git clone https://github.com/nasa/apod-api.git
+   ```
+
+3. Install dependencies in the project's lib directory.
+   Note: App Engine can only import libraries from inside your project directory.
+
+   ```
+   cd apod-api
+   pip install -r requirements.txt -t lib
+   ```
+
+4. Optional: obtain a key from http://alchemyapi.com an deposit that file
+   in the file 'alchemy_api.key'. This supports the concept_tags functionality
+   of this service.
+
+   IMPORTANT: under NO circumstances should you check in the actual instance of the key into the repository.
+
+5. To run this project locally from the command line:
+
+   ```
+   dev_appserver.py .
+   ```
+
+Visit the application [http://localhost:8080](http://localhost:8080)
+
+See [the development server documentation](https://developers.google.com/appengine/docs/python/tools/devserver)
+for options when running dev_appserver.
+
+## Docs <a name="docs"></a>
+
+### Endpoint: `/<version>/apod`
 
 There is only one endpoint in this service which takes 2 optional fields
 as parameters to a http GET request. A JSON dictionary is returned nominally. 
@@ -37,6 +97,8 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 ```bash
 localhost:5000/v1/apod?date=2014-10-01&concept_tags=True
 ```
+<details><summary>See Return Object</summary>
+<p>
 
 ```jsoniq
 {
@@ -71,9 +133,17 @@ localhost:5000/v1/apod?date=2014-10-01&concept_tags=True
 }
 ```
 
+</p>
+</details>
+
+
 ```bash
 https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5
 ```
+
+<details><summary>See Return Object</summary>
+<p>
+
 
 ```jsoniq
 [
@@ -127,10 +197,17 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5
 ]
 ```
 
+</p>
+</details>
+
+
+
 ```bash
 https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_date=2017-07-10 
 ```
 
+<details><summary>CLICK ME</summary>
+<p>
 
 ```jsoniq
 [
@@ -165,54 +242,12 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_d
 ]
 ```
 
-## Getting started
 
-1. Install the [App Engine Python SDK](https://developers.google.com/appengine/downloads).
+</p>
+</details>
 
-This API runs on Google App Engine.  It's not an easy development environment, especially when compared against to lightweight Flask APIs.  But scaling in production is amazingly simple.  The setup is non-trivial but it's worth it.  
 
-I would encourage installing App Engine via [Google Cloud SDK](https://cloud.google.com/sdk/).  It's included in the install.
-```bash
-curl https://sdk.cloud.google.com | bash
-```
-Follow the install prompts at the command line and then restart your terminal (or just `source .bash_profile` or `source .bashrc`).  Then type the following to authenticate.
-```bash
-gcloud auth login
-```
 
-See the README file for directions. 
-You'll need python 2.7 and [pip 1.4 or later](http://www.pip-installer.org/en/latest/installing.html) installed too..
-
-2. Clone this repo with
-
-   ```
-   git clone https://github.com/nasa/apod-api.git
-   ```
-
-3. Install dependencies in the project's lib directory.
-   Note: App Engine can only import libraries from inside your project directory.
-
-   ```
-   cd apod-api
-   pip install -r requirements.txt -t lib
-   ```
-
-4. Optional: obtain a key from http://alchemyapi.com an deposit that file
-   in the file 'alchemy_api.key'. This supports the concept_tags functionality
-   of this service.
-
-   IMPORTANT: under NO circumstances should you check in the actual instance of the key into the repository.
-
-5. To run this project locally from the command line:
-
-   ```
-   dev_appserver.py .
-   ```
-
-Visit the application [http://localhost:8080](http://localhost:8080)
-
-See [the development server documentation](https://developers.google.com/appengine/docs/python/tools/devserver)
-for options when running dev_appserver.
 
 ## Deploy
 
@@ -235,13 +270,10 @@ page for libraries that are already included in the SDK.  To include SDK
 libraries, add them in your app.yaml file. Other than libraries included in
 the SDK, only pure python libraries may be added to an App Engine project.
 
-### Feedback
+## Feedback <a name="feedback"></a>
 Star this repo if you found it useful. Use the github issue tracker to give
 feedback on this repo.
 
-## Licensing
-See [LICENSE](LICENSE)
-
-## Author
+## Author <a name="author"></a>
 Brian Thomas (based on code by Dan Hammer) 
 
