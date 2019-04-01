@@ -206,7 +206,7 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5
 https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_date=2017-07-10 
 ```
 
-<details><summary>CLICK ME</summary>
+<details><summary>See Return Object</summary>
 <p>
 
 ```jsoniq
@@ -246,29 +246,6 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_d
 </p>
 </details>
 
-
-
-
-## Deploy
-
-To deploy the application:
-
-1. Use the [Admin Console](https://appengine.google.com) to create a
-   project/app id. (App id and project id are identical)
-1. [Deploy the
-   application](https://developers.google.com/appengine/docs/python/tools/uploadinganapp) with
-
-   ```
-   appcfg.py -A apod-api update .
-   ```
-1. Congratulations!  Your application is now live at apod-api.appspot.com
-
-### Installing Libraries
-See the [Third party
-libraries](https://developers.google.com/appengine/docs/python/tools/libraries27)
-page for libraries that are already included in the SDK.  To include SDK
-libraries, add them in your app.yaml file. Other than libraries included in
-the SDK, only pure python libraries may be added to an App Engine project.
 
 ## Feedback <a name="feedback"></a>
 Star this repo if you found it useful. Use the github issue tracker to give
