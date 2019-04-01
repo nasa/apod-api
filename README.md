@@ -83,15 +83,11 @@ conda activate ./env
 ```bash
 pip install -r requirements.txt
 ```
-
-
-
-
-
 6. Run the server locally
 ```bash
 python apod/service.py
 ```
+&nbsp;
 ## Docs <a name="docs"></a>
 
 ### Endpoint: `/<version>/apod`
