@@ -20,9 +20,8 @@ Engine with the [Flask micro framework](http://flask.pocoo.org).
 1. Clone the repo
 ```bash
 git clone https://github.com/nasa/apod-api
-```\
-\
-\
+```
+#  
 2. `cd` into the new directory
 `cd apod-api`
 
