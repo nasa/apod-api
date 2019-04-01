@@ -21,12 +21,12 @@ Engine with the [Flask micro framework](http://flask.pocoo.org).
 ```bash
 git clone https://github.com/nasa/apod-api
 ```
-
+<br>
 2. `cd` into the new directory
 ```bash
 cd apod-api
 ```
-
+<br>
 3. Install dependencies into the project's `lib`
 ```bash
 pip install -r requirements.txt -t lib
