@@ -21,22 +21,23 @@ Engine with the [Flask micro framework](http://flask.pocoo.org).
 ```bash
 git clone https://github.com/nasa/apod-api
 ```
-<br/>
+
 2. `cd` into the new directory
 ```bash
 cd apod-api
 ```
-<br/>
+
 3. Install dependencies into the project's `lib`
 ```bash
 pip install -r requirements.txt -t lib
 ```
-<br/>
+
+
 4. Add `lib` to your PYTHONPATH and run the server
 ```bash
 PYTHONPATH=./lib python apod/service.py
 ```
-<br/>
+
 ### `virtualenv` environment <a name="virtualenv"></a>
 
 1. Clone the rep
