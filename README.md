@@ -15,52 +15,59 @@ Engine with the [Flask micro framework](http://flask.pocoo.org).
 
 ## Getting started <a name="getting_started"></a>
 
-1. Install the [App Engine Python SDK](https://developers.google.com/appengine/downloads).
+### Standard environment <a name="standard_env"></a>
 
-This API runs on Google App Engine.  It's not an easy development environment, especially when compared against to lightweight Flask APIs.  But scaling in production is amazingly simple.  The setup is non-trivial but it's worth it.  
+1. Clone the repo
+`git clone https://github.com/nasa/apod-api`
 
-I would encourage installing App Engine via [Google Cloud SDK](https://cloud.google.com/sdk/).  It's included in the install.
-```bash
-curl https://sdk.cloud.google.com | bash
-```
-Follow the install prompts at the command line and then restart your terminal (or just `source .bash_profile` or `source .bashrc`).  Then type the following to authenticate.
-```bash
-gcloud auth login
-```
+2. `cd` into the new directory
+`cd apod-api`
 
-See the README file for directions. 
-You'll need python 2.7 and [pip 1.4 or later](http://www.pip-installer.org/en/latest/installing.html) installed too..
+3. Install dependencies into the project's `lib`
+`pip install -r requirements.txt -t lib`
 
-2. Clone this repo with
+4. Add `lib` to your PYTHONPATH and run the server
+`PYTHONPATH=./lib python apod/service.py`
 
-   ```
-   git clone https://github.com/nasa/apod-api.git
-   ```
+### `virtualenv` environment <a name="virtualenv"></a>
 
-3. Install dependencies in the project's lib directory.
-   Note: App Engine can only import libraries from inside your project directory.
+1. Clone the rep
+`git clone https://github.com/nasa/apod-api`
 
-   ```
-   cd apod-api
-   pip install -r requirements.txt -t lib
-   ```
+2. `cd` into the new directory
+`cd apod-api`
 
-4. Optional: obtain a key from http://alchemyapi.com an deposit that file
-   in the file 'alchemy_api.key'. This supports the concept_tags functionality
-   of this service.
+3. Create a new virtual environment `env` in the directory
+`python -m virtualenv env`
 
-   IMPORTANT: under NO circumstances should you check in the actual instance of the key into the repository.
+4. Activate the new environment
+`source env/bin/activate`
 
-5. To run this project locally from the command line:
+5. Install dependencies in new environment
+`pip install -r requirements.txt`
 
-   ```
-   dev_appserver.py .
-   ```
+6. Run the server locally
+`python apod/service.py`
 
-Visit the application [http://localhost:8080](http://localhost:8080)
+### `conda` environment <a name="conda"></a>
 
-See [the development server documentation](https://developers.google.com/appengine/docs/python/tools/devserver)
-for options when running dev_appserver.
+1. Clone the repo
+`git clone https://github.com/nasa/apod-api`
+
+2. `cd` into the new directory
+`cd apod-api`
+
+3. Create a new virtual environment `env` in the directory
+`conda create --prefix ./env python=2.7`
+
+4. Activate the new environment
+`conda activate ./env`
+
+5. Install dependencies in new environment
+`pip install -r requirements.txt`
+
+6. Run the server locally
+`python apod/service.py`
 
 ## Docs <a name="docs"></a>
 
