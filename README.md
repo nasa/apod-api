@@ -12,9 +12,9 @@ Engine with the [Flask micro framework](http://flask.pocoo.org).
 3. [Feedback](#feedback)
 4. [Author](#author)
 
-
-## Getting started <a name="getting_started"></a>
 &nbsp;
+## Getting started <a name="getting_started"></a>
+
 ### Standard environment <a name="standard_env"></a>
 
 1. Clone the repo
