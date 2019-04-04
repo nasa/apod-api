@@ -1,7 +1,6 @@
 # Astronomy Picture of the Day (APOD) microservice
 
-A microservice written in Python which may be run on Google App 
-Engine with the [Flask micro framework](http://flask.pocoo.org).
+A microservice written in Python with the [Flask micro framework](http://flask.pocoo.org).
 
 # Table of contents
 1. [Getting Started](#getting_started)
