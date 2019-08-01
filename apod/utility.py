@@ -194,12 +194,16 @@ def _explanation(soup):
     """
     # Handler for later APOD entries
     LOG.debug('getting the explanation')
-    s = soup.find_all('p')[2].text
+    s = soup.text
+
+    s = s[s.find("Explanation:") + len("Explanation:"):s.find("Tomorrow's picture:")]
+
     s = s.replace('\n', ' ')
     s = s.replace('  ', ' ')
     s = s.strip(' ').strip('Explanation: ')
     s = s.split(' Tomorrow\'s picture')[0]
     s = s.strip(' ')
+
     if s == '':
         # Handler for earlier APOD entries
         texts = [x.strip() for x in soup.text.split('\n')]
