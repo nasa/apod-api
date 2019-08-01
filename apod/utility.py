@@ -105,9 +105,15 @@ def _title(soup):
     LOG.debug('getting the title')
     try:
         # Handler for later APOD entries
-        center_selection = soup.find_all('center')[1]
+        if len(soup.find_all('center')) == 2:
+            center_selection = soup.find_all('center')[0].find_all("p")[1]
+
+        else:
+            center_selection = soup.find_all('center')[1]
+
         bold_selection = center_selection.find_all('b')[0]
-        title = bold_selection.text.strip(' ')
+        title = bold_selection.text.replace("Credit:","").strip(' ').strip("\n")
+
         try:
             title = title.encode('latin1').decode('cp1252')
         except Exception as ex:
