@@ -200,8 +200,9 @@ def _explanation(soup):
 
     s = s.replace('\n', ' ')
     s = s.replace('  ', ' ')
-    s = s.strip(' ').strip('Explanation: ')
-    s = s.split(' Tomorrow\'s picture')[0]
+    #s = s.strip(' ').strip('Explanation: ') The Second strip was causing errors... Strip does not work like replace(word,1)!. If a text was beggining with the same letters of the word
+    #explanations it would cut of in half. For example extrordinary would be trordinary haha!!
+    #s = s.split(' Tomorrow\'s picture')[0]
     s = s.strip(' ')
 
     if s == '':
