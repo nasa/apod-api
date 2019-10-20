@@ -116,6 +116,7 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 - `explanation` The supplied text explanation of the image.
 - `concepts` The most relevant concepts within the text explanation.  Only supplied if `concept_tags` is set to True.
 - `thumbnail_url` The URL of thumbnail of the video. 
+- `copyright` The name of the copyright holder.
 
 **Example**
 
