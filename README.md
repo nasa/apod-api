@@ -86,6 +86,26 @@ pip install -r requirements.txt
 ```bash
 python apod/service.py
 ```
+
+### Run it in Docker
+
+1. Clone the repo
+```bash
+git clone https://github.com/nasa/apod-api.git
+```
+2. `cd` into the new directory
+```bash
+cd apod-api
+```
+3. Build the image
+```bash
+docker build . -t apod-api
+```
+4. Run the image
+```bash
+docker run -p 5000:5000 apod-api
+```
+
 &nbsp;
 ## Docs <a name="docs"></a>
 
