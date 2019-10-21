@@ -1,7 +1,7 @@
 """
 A micro-service passing back enhanced information from Astronomy
 Picture of the Day (APOD).
-    
+
 Adapted from code in https://github.com/nasa/planetary-api
 Dec 1, 2015 (written by Dan Hammer)
 
@@ -25,7 +25,7 @@ CORS(app)
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
-# this should reflect both this service and the backing 
+# this should reflect both this service and the backing
 # assorted libraries
 SERVICE_VERSION = 'v1'
 APOD_METHOD_NAME = 'apod'
@@ -278,4 +278,4 @@ def application_error(e):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0' ,port=5000)
