@@ -2,6 +2,8 @@
 
 A microservice written in Python with the [Flask micro framework](http://flask.pocoo.org).
 
+### NOTE: Active code is in the EB branch. EB stands for Elastic Beanstalk. Some names and position of code had to be changed to work well given AWS's assumptions of what Flask files are called and located.
+
 # Table of contents
 1. [Getting Started](#getting_started)
     1. [Standard environment](#standard_env)
