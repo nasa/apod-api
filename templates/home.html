@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+<title>NASA/OCIO Astronomy Picture Of the Day (APOD) Service</title>
+</head><body>
+<p>
+<h2>NASA/OCIO Astronomy Picture Of the Day (APOD) Service</h2>
+</p>
+
+<h3>Service API</h3>
+<p>
+This service contains a single endpoint, &quot;<i>/{{ version }}/{{ methodname }}/</i>&quot;,
+which may be used to obtain a selected image url and metadata from http://apod.nasa.gov.
+
+You can use this service endpoint by sending a GET request which may contain one or
+more of the following parameters which direct its output:
+<table border="1">
+<tbody>
+<tr><th>Allowed Field</th><th>Description</th></tr>
+<tr><td><b>date</b></td><td>A string in YYYY-MM-DD format indicating the date of the APOD image
+(example: 2014-11-03).  Must be after 1995-06-16, the first day an APOD picture was posted.
+There are no images for tomorrow available through this API. <i>Defaults to today's date.</i></td></tr>
+<tr><td><b>concept_tags</b></td><td>A boolean indicating whether concept tags should be returned with the
+rest of the response.  The concept tags are not necessarily included in the explanation, but
+rather derived from common search tags that are associated with the description text.
+(Better than just pure text search.). <i>Defaults to False.</i></td></tr>
+</tbody></table>
+</p><p>
+For example, using curl (http://curl.haxx.se):
+</p><p>
+<font size="+2">
+<pre>
+curl http://{{ service_url }}/{{ version }}/{{ methodname }}/?concept_tags=True&amp;date=2015-10-11
+</pre>
+</font>
+</p><p>
+which should return an application/json response with a JSON formatted string containing
+the desired information.
+For example, the return JSON from the above query is:
+</p><p>
+<pre>
+{
+  "concepts": "concept_tags functionality turned off in current service",
+  "date": "2015-10-11",
+  "explanation": "Clouds of glowing gas mingle with dust lanes in the Trifid Nebula, a star forming region toward the constellation of the Archer (Sagittarius).  In the center, the three prominent dust lanes that give the Trifid its name all come together. Mountains of opaque dust appear on the right, while other dark filaments of dust are visible threaded throughout the nebula.  A single massive star visible near the center causes much of the Trifid's glow.  The Trifid, also known as M20, is only about 300,000 years old, making it among the youngest emission nebulae known.  The nebula lies about 9,000 light years away and the part pictured here spans about 10 light years.  The above image is a composite with luminance taken from an image by the 8.2-m ground-based Subaru Telescope, detail provided by the 2.4-m orbiting Hubble Space Telescope, color data provided by Martin Pugh and image assembly and processing provided by Robert Gendler.   Follow APOD on: Facebook,  Google Plus, or Twitter",
+  "service_version": "v1",
+  "title": "In the Center of the Trifid Nebula",
+  "url": "http://apod.nasa.gov/apod/image/1510/Trifid_HubbleGendler_960.jpg"
+}
+</pre>
+</p><p>
+Returned field meanings are as follows:
+</p><p>
+<table border="1"><tbody>
+<tr><th>Returned Field</th><th>Description</th></tr>
+<tr><td><b>resource</b></td>    <td>A dictionary describing the `image_set` or `planet` that the
+response illustrates, completely determined by the structured endpoint</td></tr>
+<tr><td><b>concept_tags</b></td><td>A boolean reflection of the supplied option.  Included in response because of default values.</td></tr>
+<tr><td><b>title</b></td>       <td>The title of the image.</td></tr>
+<tr><td><b>date</b></td>        <td>Date of image. Included in response because of default values.</td></tr>
+<tr><td><b>url</b></td>         <td>The URL of the APOD image of the day.</td></tr>
+<tr><td><b>explanation</b></td> <td>The supplied text explanation of the image.</td></tr>
+<tr><td><b>concepts</b></td>    <td>The most relevant concepts within the text explanation.  Only supplied if `concept_tags` is set to True.</td></tr>
+<tr><td><b>thumbnail_url</b></td>    <td>The URL of thumbnail of the video.  Only supplied if `thumbs` is set to True.</td></tr>
+</tbody></table>
+</body></html>
