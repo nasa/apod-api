@@ -37,7 +37,7 @@ pip install -r requirements.txt -t lib
 ```
 4. Add `lib` to your PYTHONPATH and run the server
 ```bash
-PYTHONPATH=./lib python apod/service.py
+PYTHONPATH=./lib python application.py
 ```
 &nbsp;
 ### `virtualenv` environment <a name="virtualenv"></a>
@@ -64,7 +64,7 @@ pip install -r requirements.txt
 ```
 6. Run the server locally
 ```bash
-python apod/service.py
+python application.py
 ```
 &nbsp;
 ### `conda` environment <a name="conda"></a>
@@ -79,7 +79,7 @@ cd apod-api
 ```
 3. Create a new virtual environment `env` in the directory
 ```bash
-conda create --prefix ./env python=2.7
+conda create --prefix ./env
 ```
 4. Activate the new environment
 ```bash
@@ -91,7 +91,7 @@ pip install -r requirements.txt
 ```
 6. Run the server locally
 ```bash
-python apod/service.py
+python application.py
 ```
 &nbsp;
 ## Docs <a name="docs"></a>
@@ -285,4 +285,5 @@ feedback on this repo.
 
 ## Author <a name="author"></a>
 Brian Thomas (based on code by Dan Hammer) 
+Justin Gosses (made changes to run on AWS Elastic Beanstalk after heroku instance was shut-down)
 
