@@ -4,6 +4,11 @@ A microservice written in Python with the [Flask micro framework](http://flask.p
 
 ### NOTE: Active code is in the EB branch. EB stands for Elastic Beanstalk. Some names and position of code had to be changed to work well given AWS's assumptions of what Flask files are called and located.
 
+The changes over previous version were (previous version still in Master as of this writing):
+1. Moved main code out of the APOD folder and into the top level directory as Elastic Beanstalk had a hard time finding the initial python file unless it was in the top-level folder. 
+2. Changed service.py to application.py
+3. Changed references to app in application.py to application
+
 # Table of contents
 1. [Getting Started](#getting_started)
     1. [Standard environment](#standard_env)
