@@ -109,13 +109,23 @@ def _title(soup):
     LOG.debug('getting the title')
     try:
         # Handler for later APOD entries
-        center_selection = soup.find_all('center')[1]
-        bold_selection = center_selection.find_all('b')[0]
-        title = bold_selection.text.strip(' ')
-        try:
-            title = title.encode('latin1').decode('cp1252')
-        except Exception as ex:
-            LOG.error(str(ex))
+        number_of_center_elements = len(soup.find_all('center'))
+        if(number_of_center_elements == 2):
+            center_selection = soup.find_all('center')[0]
+            bold_selection = center_selection.find_all('b')[0]
+            title = bold_selection.text.strip(' ')
+            try:
+                title = title.encode('latin1').decode('cp1252')
+            except Exception as ex:
+                LOG.error(str(ex))
+         else:
+            center_selection = soup.find_all('center')[1]
+            bold_selection = center_selection.find_all('b')[0]
+            title = bold_selection.text.strip(' ')
+            try:
+                title = title.encode('latin1').decode('cp1252')
+            except Exception as ex:
+                LOG.error(str(ex))
         
         return title
     except Exception:
