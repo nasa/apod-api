@@ -118,7 +118,7 @@ def _title(soup):
                 title = title.encode('latin1').decode('cp1252')
             except Exception as ex:
                 LOG.error(str(ex))
-         else:
+        else:
             center_selection = soup.find_all('center')[1]
             bold_selection = center_selection.find_all('b')[0]
             title = bold_selection.text.strip(' ')
