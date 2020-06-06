@@ -46,6 +46,10 @@ def _get_thumbs(data):
 
     return video_thumb
 
+# function that returns only last URL if there are multiple URLs stacked together
+def _get_last_url(data):
+    regex = re.compile("(?:.(?!http[s]?://))+$")
+    return regex.findall(data)[0]
 
 def _get_apod_chars(dt, thumbs):
     media_type = 'image'
@@ -83,11 +87,11 @@ def _get_apod_chars(dt, thumbs):
         props['copyright'] = copyright_text
     props['media_type'] = media_type
     if data:
-        props['url'] = data
+        props['url'] = _get_last_url(data)
     props['date'] = dt.isoformat()
 
     if hd_data:
-        props['hdurl'] = hd_data
+        props['hdurl'] = _get_last_url(hd_data)
 
     if thumbs and media_type == "video":
         if thumbs.lower() == "true":
@@ -105,13 +109,23 @@ def _title(soup):
     LOG.debug('getting the title')
     try:
         # Handler for later APOD entries
-        center_selection = soup.find_all('center')[1]
-        bold_selection = center_selection.find_all('b')[0]
-        title = bold_selection.text.strip(' ')
-        try:
-            title = title.encode('latin1').decode('cp1252')
-        except Exception as ex:
-            LOG.error(str(ex))
+        number_of_center_elements = len(soup.find_all('center'))
+        if(number_of_center_elements == 2):
+            center_selection = soup.find_all('center')[0]
+            bold_selection = center_selection.find_all('b')[0]
+            title = bold_selection.text.strip(' ')
+            try:
+                title = title.encode('latin1').decode('cp1252')
+            except Exception as ex:
+                LOG.error(str(ex))
+        else:
+            center_selection = soup.find_all('center')[1]
+            bold_selection = center_selection.find_all('b')[0]
+            title = bold_selection.text.strip(' ')
+            try:
+                title = title.encode('latin1').decode('cp1252')
+            except Exception as ex:
+                LOG.error(str(ex))
         
         return title
     except Exception:
