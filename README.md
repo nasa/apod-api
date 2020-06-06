@@ -2,6 +2,24 @@
 
 A microservice written in Python with the [Flask micro framework](http://flask.pocoo.org).
 
+## NOTES: 
+
+### Code re-organization has occurred [2020-05-04]!
+Code was reorganized to make it work more easily on AWS's Elastic Beanstalk service.
+
+The changes over previous version were :
+1. Moved main code out of the APOD folder and into the top level directory as Elastic Beanstalk had a hard time finding the initial python file unless it was in the top-level folder. 
+2. Changed service.py to application.py
+3. Changed references to app in application.py to application
+
+You can find a frozen version of the previous code in the branch called <a href="https://github.com/nasa/apod-api/tree/prevCodeOrganization">"prevCodeOrganization"</a>
+
+#### API Reliability
+A very large number of people use the instance of this API that NASA has set up. If you need a extremely reliable version of this API, you likely want to stand up your own version of the API. You can do that with this code! All information that this API returns is actually just grabbed from the <a href='https://apod.nasa.gov/apod/astropix.html'>Astronomy Photo of the Day Website</a> (APOD).
+
+#### Content Related Issues
+No one watching this repository has anything to do with Astronomy Photo of the Day website, so we're unable to deal with issues directly related to their content. Please contact them directly.
+
 # Table of contents
 1. [Getting Started](#getting_started)
     1. [Standard environment](#standard_env)
@@ -30,12 +48,12 @@ pip install -r requirements.txt -t lib
 ```
 4. Add `lib` to your PYTHONPATH and run the server
 ```bash
-PYTHONPATH=./lib python apod/service.py
+PYTHONPATH=./lib python application.py
 ```
 &nbsp;
 ### `virtualenv` environment <a name="virtualenv"></a>
 
-1. Clone the rep
+1. Clone the repo
 ```bash
 git clone https://github.com/nasa/apod-api
 ```
@@ -57,7 +75,7 @@ pip install -r requirements.txt
 ```
 6. Run the server locally
 ```bash
-python apod/service.py
+python application.py
 ```
 &nbsp;
 ### `conda` environment <a name="conda"></a>
@@ -72,7 +90,7 @@ cd apod-api
 ```
 3. Create a new virtual environment `env` in the directory
 ```bash
-conda create --prefix ./env python=2.7
+conda create --prefix ./env
 ```
 4. Activate the new environment
 ```bash
@@ -84,7 +102,7 @@ pip install -r requirements.txt
 ```
 6. Run the server locally
 ```bash
-python apod/service.py
+python application.py
 ```
 
 ### Run it in Docker
@@ -135,7 +153,9 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 - `media_type` The type of media (data) returned. May either be 'image' or 'video' depending on content.
 - `explanation` The supplied text explanation of the image.
 - `concepts` The most relevant concepts within the text explanation.  Only supplied if `concept_tags` is set to True.
-- `thumbnail_url` The URL of thumbnail of the video.
+- `thumbnail_url` The URL of thumbnail of the video. 
+- `copyright` The name of the copyright holder.
+- `service_version` The service version used.
 
 **Example**
 
@@ -297,4 +317,6 @@ Star this repo if you found it useful. Use the github issue tracker to give
 feedback on this repo.
 
 ## Author <a name="author"></a>
-Brian Thomas (based on code by Dan Hammer)
+- Brian Thomas (based on code by Dan Hammer) 
+- Justin Gosses (made changes to allow this repository to run more easily on AWS Elastic Beanstalk after heroku instance was shut-down)
+

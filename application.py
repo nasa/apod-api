@@ -8,9 +8,14 @@ Dec 1, 2015 (written by Dan Hammer)
 @author=danhammer
 @author=bathomas @email=brian.a.thomas@nasa.gov
 @author=jnbetancourt @email=jennifer.n.betancourt@nasa.gov
+
+adapted for AWS Elastic Beanstalk deployment
+@author=JustinGOSSES @email=justin.c.gosses@nasa.gov
 """
 import sys
 sys.path.insert(0, "../lib")
+### justin edit
+sys.path.insert(1, ".")
 
 from datetime import datetime, date
 from random import sample
@@ -19,8 +24,11 @@ from flask_cors import CORS
 from utility import parse_apod, get_concepts
 import logging
 
-app = Flask(__name__)
-CORS(app)
+#### added by justin for EB
+#from wsgiref.simple_server import make_server
+
+application = Flask(__name__)
+CORS(application)
 
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -208,7 +216,7 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
 # Endpoints
 #
 
-@app.route('/')
+@application.route('/')
 def home():
     return render_template('home.html', version=SERVICE_VERSION,
                            service_url=request.host,
@@ -216,7 +224,7 @@ def home():
                            usage=_usage(joinstr='", "', prestr='"') + '"')
 
 
-@app.route('/' + SERVICE_VERSION + '/' + APOD_METHOD_NAME + '/', methods=['GET'])
+@application.route('/' + SERVICE_VERSION + '/' + APOD_METHOD_NAME + '/', methods=['GET'])
 def apod():
     LOG.info('apod path called')
     try:
@@ -260,7 +268,7 @@ def apod():
             return _abort(500, 'Internal Service Error', usage=False)
 
 
-@app.errorhandler(404)
+@application.errorhandler(404)
 def page_not_found(e):
     """
     Return a custom 404 error.
@@ -269,7 +277,7 @@ def page_not_found(e):
     return _abort(404, 'Sorry, Nothing at this URL.', usage=True)
 
 
-@app.errorhandler(500)
+@application.errorhandler(500)
 def application_error(e):
     """
     Return a custom 500 error.
@@ -278,4 +286,7 @@ def application_error(e):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0' ,port=5000)
+    application.run('0.0.0.0')
+    # httpd = make_server('', 8000, application)
+    # print("Serving on port 8000...")
+    # httpd.serve_forever()
