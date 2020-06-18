@@ -66,6 +66,8 @@ def _get_apod_chars(dt, thumbs):
         with open(default_obj_path, 'r') as f:
             default_obj_props = json.load(f)
 
+        default_obj_props['date'] = dt.strftime('%Y-%m-%d')
+
         return default_obj_props
 
     soup = BeautifulSoup(res.text, 'html.parser')
