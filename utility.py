@@ -13,7 +13,6 @@ import logging
 import json
 import re
 import urllib3 as urllib
-from flask import current_app as app
 # import urllib.request
 
 LOG = logging.getLogger(__name__)
@@ -61,7 +60,7 @@ def _get_apod_chars(dt, thumbs):
     
     if res.status_code == 404:
         LOG.error(f'No APOD entry for URL: {apod_url}')
-        default_obj_path = f'{app.root_path}/static/default_apod_object.json'
+        default_obj_path = 'static/default_apod_object.json'
         LOG.debug(f'Loading default APOD response from {default_obj_path}')
         with open(default_obj_path, 'r') as f:
             default_obj_props = json.load(f)
