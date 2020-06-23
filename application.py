@@ -19,7 +19,7 @@ sys.path.insert(1, ".")
 
 from datetime import datetime, date
 from random import sample
-from flask import request, jsonify, render_template, Flask
+from flask import request, jsonify, render_template, Flask, current_app
 from flask_cors import CORS
 from utility import parse_apod, get_concepts
 import logging
@@ -222,6 +222,11 @@ def home():
                            service_url=request.host,
                            methodname=APOD_METHOD_NAME,
                            usage=_usage(joinstr='", "', prestr='"') + '"')
+
+@application.route('/static/<asset_path>')
+def serve_static(asset_path):
+    print(asset_path)
+    return current_app.send_static_file(asset_path)
 
 
 @application.route('/' + SERVICE_VERSION + '/' + APOD_METHOD_NAME + '/', methods=['GET'])
