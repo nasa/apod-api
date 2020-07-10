@@ -59,15 +59,16 @@ def _get_apod_chars(dt, thumbs):
     res = requests.get(apod_url)
     
     if res.status_code == 404:
-        LOG.error(f'No APOD entry for URL: {apod_url}')
-        default_obj_path = 'static/default_apod_object.json'
-        LOG.debug(f'Loading default APOD response from {default_obj_path}')
-        with open(default_obj_path, 'r') as f:
-            default_obj_props = json.load(f)
+        return None
+        # LOG.error(f'No APOD entry for URL: {apod_url}')
+        # default_obj_path = 'static/default_apod_object.json'
+        # LOG.debug(f'Loading default APOD response from {default_obj_path}')
+        # with open(default_obj_path, 'r') as f:
+        #     default_obj_props = json.load(f)
 
-        default_obj_props['date'] = dt.strftime('%Y-%m-%d')
+        # default_obj_props['date'] = dt.strftime('%Y-%m-%d')
 
-        return default_obj_props
+        # return default_obj_props
 
     soup = BeautifulSoup(res.text, 'html.parser')
     LOG.debug('getting the data url')

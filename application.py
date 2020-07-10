@@ -18,7 +18,7 @@ sys.path.insert(0, "../lib")
 sys.path.insert(1, ".")
 
 from datetime import datetime, date
-from random import sample
+from random import shuffle
 from flask import request, jsonify, render_template, Flask, current_app
 from flask_cors import CORS
 from utility import parse_apod, get_concepts
@@ -31,6 +31,7 @@ application = Flask(__name__)
 CORS(application)
 
 LOG = logging.getLogger(__name__)
+# logging.basicConfig(level=logging.INFO)
 logging.basicConfig(level=logging.DEBUG)
 
 # this should reflect both this service and the backing 
@@ -91,7 +92,10 @@ def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False, thum
     served through the API.
     """
     try:
+        
         page_props = parse_apod(dt, use_default_today_date, thumbs)
+        if not page_props:
+            return None
         LOG.debug('managed to get apod page characteristics')
 
         if use_concept_tags:
@@ -145,22 +149,32 @@ def _get_json_for_random_dates(count, use_concept_tags, thumbs):
     :param use_concept_tags:
     :return:
     """
-
     if count > 100 or count <= 0:
         raise ValueError('Count must be positive and cannot exceed 100')
-
     begin_ordinal = datetime(1995, 6, 16).toordinal()
     today_ordinal = datetime.today().toordinal()
 
-    date_range = range(begin_ordinal, today_ordinal + 1)
-    random_date_ordinals = sample(date_range, count)
+    random_date_ordinals = list(range(begin_ordinal, today_ordinal + 1))
+    shuffle(random_date_ordinals)
+
+    # FOR TESTING ONLY!
+    bad_ordinal = datetime(2020, 6, 10).toordinal()
+    random_date_ordinals = [bad_ordinal] + random_date_ordinals
+    assert random_date_ordinals[0] == 737586
 
     all_data = []
     for date_ordinal in random_date_ordinals:
         dt = date.fromordinal(date_ordinal)
         data = _apod_handler(dt, use_concept_tags, date_ordinal == today_ordinal, thumbs)
+        
+        # Handle case where no data is available
+        if not data:
+            continue
+
         data['service_version'] = SERVICE_VERSION
         all_data.append(data)
+        if len(all_data) == count:
+            break
 
     return jsonify(all_data)
 
@@ -225,7 +239,6 @@ def home():
 
 @application.route('/static/<asset_path>')
 def serve_static(asset_path):
-    print(asset_path)
     return current_app.send_static_file(asset_path)
 
 
