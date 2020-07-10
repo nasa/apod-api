@@ -213,7 +213,14 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
     while start_ordinal <= end_ordinal:
         # get data
         dt = date.fromordinal(start_ordinal)
+        
         data = _apod_handler(dt, use_concept_tags, start_ordinal == today_ordinal, thumbs)
+
+        # Handle case where no data is available
+        if not data:
+            start_ordinal += 1
+            continue
+
         data['service_version'] = SERVICE_VERSION
 
         if data['date'] == dt.isoformat():
