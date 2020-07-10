@@ -162,11 +162,6 @@ def _get_json_for_random_dates(count, use_concept_tags, thumbs):
     random_date_ordinals = list(range(begin_ordinal, today_ordinal + 1))
     shuffle(random_date_ordinals)
 
-    # FOR TESTING ONLY!
-    bad_ordinal = datetime(2020, 6, 10).toordinal()
-    random_date_ordinals = [bad_ordinal] + random_date_ordinals
-    assert random_date_ordinals[0] == 737586
-
     all_data = []
     for date_ordinal in random_date_ordinals:
         dt = date.fromordinal(date_ordinal)
@@ -178,7 +173,7 @@ def _get_json_for_random_dates(count, use_concept_tags, thumbs):
 
         data['service_version'] = SERVICE_VERSION
         all_data.append(data)
-        if len(all_data) == count:
+        if len(all_data) >= count:
             break
 
     return jsonify(all_data)
