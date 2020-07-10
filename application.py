@@ -286,7 +286,7 @@ def application_error(e):
 
 
 if __name__ == '__main__':
-    application.run('0.0.0.0')
+    application.run('0.0.0.0', port=5000)
     # httpd = make_server('', 8000, application)
     # print("Serving on port 8000...")
     # httpd.serve_forever()
