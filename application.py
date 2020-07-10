@@ -135,6 +135,11 @@ def _get_json_for_date(input_date, use_concept_tags, thumbs):
 
     # get data
     data = _apod_handler(dt, use_concept_tags, use_default_today_date, thumbs)
+
+    # Handle case where no data is available
+    if not data:
+        return _abort(code=404, msg=f"No data available for date: {input_date}", usage=False)
+
     data['service_version'] = SERVICE_VERSION
 
     # return info as JSON
