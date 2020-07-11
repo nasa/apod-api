@@ -21,7 +21,7 @@ from datetime import datetime, date
 from random import shuffle
 from flask import request, jsonify, render_template, Flask, current_app
 from flask_cors import CORS
-from utility import parse_apod, get_concepts
+from apod.utility import parse_apod, get_concepts
 import logging
 
 #### added by justin for EB
