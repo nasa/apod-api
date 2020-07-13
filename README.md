@@ -4,23 +4,28 @@ A microservice written in Python with the [Flask micro framework](http://flask.p
 
 ## NOTES: 
 
-### Code re-organization has occurred [2020-05-04]!
+### Code re-organization has occurred [2020-05-04]
+
 Code was reorganized to make it work more easily on AWS's Elastic Beanstalk service.
 
 The changes over previous version were :
-1. Moved main code out of the APOD folder and into the top level directory as Elastic Beanstalk had a hard time finding the initial python file unless it was in the top-level folder. 
+
+1. Moved main code out of the APOD folder and into the top level directory as Elastic Beanstalk had a hard time finding the initial python file unless it was in the top-level folder.
 2. Changed service.py to application.py
 3. Changed references to app in application.py to application
 
 You can find a frozen version of the previous code in the branch called <a href="https://github.com/nasa/apod-api/tree/prevCodeOrganization">"prevCodeOrganization"</a>
 
 #### API Reliability
+
 A very large number of people use the instance of this API that NASA has set up. If you need a extremely reliable version of this API, you likely want to stand up your own version of the API. You can do that with this code! All information that this API returns is actually just grabbed from the <a href='https://apod.nasa.gov/apod/astropix.html'>Astronomy Photo of the Day Website</a> (APOD).
 
 #### Content Related Issues
+
 No one watching this repository has anything to do with Astronomy Photo of the Day website, so we're unable to deal with issues directly related to their content. Please contact them directly.
 
 # Table of contents
+
 1. [Getting Started](#getting_started)
     1. [Standard environment](#standard_env)
     2. [`virtualenv` environment](#virtualenv)
@@ -30,6 +35,7 @@ No one watching this repository has anything to do with Astronomy Photo of the D
 4. [Author](#author)
 
 &nbsp;
+
 ## Getting started <a name="getting_started"></a>
 
 ### Standard environment <a name="standard_env"></a>
