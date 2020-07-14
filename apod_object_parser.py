@@ -1,6 +1,5 @@
 import requests
 import json
-import urllib
 import os
 from PIL import Image
 def get_data(api_key):
