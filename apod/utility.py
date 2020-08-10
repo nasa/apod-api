@@ -102,7 +102,7 @@ def _get_apod_chars(dt, thumbs):
     props['media_type'] = media_type
     if data:
         props['url'] = _get_last_url(data)
-    props['date'] = dt.isoformat()
+    props['date'] = dt.strftime('%Y-%m-%d')
 
     if hd_data:
         props['hdurl'] = _get_last_url(hd_data)
