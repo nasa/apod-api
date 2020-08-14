@@ -311,10 +311,37 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_d
 </p>
 </details>
 
-## Using the APOD Parser
+## The APOD Parser
 
-The APOD Parser is intended to be used for using the APOD API quickly without writing unncessary code. This is included with the source code. It's documentation can be found <a href="https://github.com/akionsight/APOD">here</a>
+The APOD Parser is intended to be used for accessing the APOD API quickly without writing unncessary code.
 
+### Usage
+
+1. First import the `apod_object_parser.py` file.
+
+2. Now use the `get_data` function and pass your API key as the only argument. You can get the API key <a href="https://api.nasa.gov/#signUp">here</a>
+
+```python
+response = nasa_apod_parser.get_data(<your_api_key>)
+```
+
+3. Now you can use the following functions:
+
+-> `get_date(response)`
+
+-> `get_explaination(response)`
+
+-> `get_hdurl(response)`
+
+-> `get_media_type(response)`
+
+-> `get_service_version(response)`
+
+-> `get_title(response)`
+
+-> `get_url(response)`
+
+**for full docs and more functions visit the original repo of the apod parser by clicking <a href="https://github.com/akionsight/APOD/">here</a>**
 
 ## Feedback <a name="feedback"></a>
 
@@ -324,5 +351,3 @@ feedback on this repo.
 ## Author <a name="author"></a>
 - Brian Thomas (based on code by Dan Hammer) 
 - Justin Gosses (made changes to allow this repository to run more easily on AWS Elastic Beanstalk after heroku instance was shut-down)
-
-
