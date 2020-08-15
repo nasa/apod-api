@@ -26,8 +26,9 @@ No one watching this repository has anything to do with Astronomy Photo of the D
     2. [`virtualenv` environment](#virtualenv)
     3. [`conda` environment](#conda)
 2. [Docs](#docs)
-3. [Feedback](#feedback)
-4. [Author](#author)
+3. [APOD parser](#TheAPODParser)
+4. [Feedback](#feedback)
+5. [Author](#author)
 
 &nbsp;
 ## Getting started <a name="getting_started"></a>
@@ -311,9 +312,9 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_d
 </p>
 </details>
 
-## The APOD Parser
+## The APOD Parser<a name="TheAPODParser"></a>
 
-The APOD Parser is intended to be used for accessing the APOD API quickly without writing unncessary code.
+The APOD Parser is intended to be used for accessing the APOD API quickly without writing unncessary code. it is present in the apod_parser folder.
 
 ### Usage
 
@@ -341,7 +342,7 @@ response = nasa_apod_parser.get_data(<your_api_key>)
 
 -> `get_url(response)`
 
-**for full docs and more functions visit the original repo of the apod parser by clicking <a href="https://github.com/akionsight/APOD/">here</a>**
+**for full docs and more functions visit the readme of  the apod parser by clicking <a href="apod_parser/apod_parser_readme.md">here</a>**
 
 ## Feedback <a name="feedback"></a>
 
@@ -351,3 +352,4 @@ feedback on this repo.
 ## Author <a name="author"></a>
 - Brian Thomas (based on code by Dan Hammer) 
 - Justin Gosses (made changes to allow this repository to run more easily on AWS Elastic Beanstalk after heroku instance was shut-down)
+
