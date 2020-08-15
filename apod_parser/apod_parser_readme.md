@@ -1,6 +1,6 @@
 # apod_object_parser
 
-get a Nasa api key by clicking [here](https://api.nasa.gov/#signUp).
+get a Nasa api key by clicking <a href="https://api.nasa.gov/#signUp" target="_blank">here</a>.
 
 ## How to use
 1. import the file
