@@ -48,7 +48,7 @@ def download_image(url, date):
             file.write(raw_image)
             
     else:
-        pass
+        return FileExistsError
 
 
 def convert_image(image_path):
