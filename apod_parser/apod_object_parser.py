@@ -2,6 +2,7 @@ import requests
 import json
 import os
 from PIL import Image
+
 def get_data(api_key):
     raw_response = requests.get(f'https://api.nasa.gov/planetary/apod?api_key={api_key}').text
     response = json.loads(raw_response)
@@ -50,9 +51,14 @@ def download_image(url, date):
         pass
 
 
-def convert_image(image):
-    basename = os.path.basename(image)
-    name = basename.split('.')[0]
-    opened = Image.open(name)
-    opened.save(f'{name}.png')
-    
+def convert_image(image_path):
+    path_to_image = os.path.normpath(image_path)
+
+    basename = os.path.basename(path_to_image)
+
+    filename_no_extension = basename.split(".")[0]
+
+    base_directory = os.path.dirname(path_to_image)
+
+    image = Image.open(path_to_image)
+    image.save(f"{base_directory}/{filename_no_extension}.png")
