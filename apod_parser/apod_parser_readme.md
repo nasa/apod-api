@@ -1,6 +1,6 @@
 # apod_object_parser
 
-get a Nasa api key by clicking <a href="https://api.nasa.gov/#signUp" target="__blank">here</a>.
+get a Nasa api key by clicking <a href="https://api.nasa.gov/#signUp">here</a>.
 
 ## How to use
 1. import the file
@@ -60,7 +60,7 @@ apod_object_parser.download_image(url, date)
 ```
 
 ### convert_image
-sometimes the image we downloaded above might not be in the right format (.jpg) so you may call `convert_image` function to convert the image into .png. takes the `image` parameter which is the filepath.
+sometimes the image we downloaded above might not be in the right format (.jpg) so you may call `convert_image` function to convert the image into .png. takes the `image_path` parameter which is the filepath.
 ```python 
-apod_object_parser.convert_image(image)
+apod_object_parser.convert_image(image_path)
 ```
