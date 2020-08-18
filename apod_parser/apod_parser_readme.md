@@ -10,7 +10,7 @@ import apod_object_parser
 2. Now call the `get_data` function and pass the `nasa api key` as the argument. Note api_key is a string. The response returned will be a Dictionary. Now you can parse the dictionary too
 
 ```python 
-response = apod_object_parser.get_data(<your_api_key>)
+response = apod_object_parser.get_data(##Pass In Your API key here)
 ```
 ### get_date
 
