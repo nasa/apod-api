@@ -53,8 +53,8 @@ def _get_last_url(data):
 
 def _get_apod_chars(dt, thumbs):
     media_type = 'image'
-    date_str = dt.strftime('%y%m%d')
     if dt:
+        date_str = dt.strftime('%y%m%d')
         apod_url = '%sap%s.html' % (BASE, date_str)
     else:
         apod_url = '%sastropix.html' % BASE
