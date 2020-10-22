@@ -291,26 +291,24 @@ def parse_apod(dt, use_default_today_date=False, thumbs=False):
 
     LOG.debug('apod chars called date:' + str(dt))
 
-    return _get_apod_chars(dt, thumbs)
+    try:
+        return _get_apod_chars(dt, thumbs)
 
-    # try:
-    #     return _get_apod_chars(dt, thumbs)
-    #
-    # except Exception as ex:
-    #
-    #     # handle edge case where the service local time
-    #     # miss-matches with 'todays date' of the underlying APOD
-    #     # service (can happen because they are deployed in different
-    #     # timezones). Use the fallback of prior day's date
-    #
-    #     if use_default_today_date:
-    #         # try to get the day before
-    #         dt = dt - timedelta(days=1)
-    #         return _get_apod_chars(dt, thumbs)
-    #     else:
-    #         # pass exception up the call stack
-    #         LOG.error(str(ex))
-    #         raise Exception(ex)
+    except Exception as ex:
+
+        # handle edge case where the service local time
+        # miss-matches with 'todays date' of the underlying APOD
+        # service (can happen because they are deployed in different
+        # timezones). Use the fallback of prior day's date
+
+        if use_default_today_date and dt:
+            # try to get the day before
+            dt = dt - datetime.timedelta(days=1)
+            return _get_apod_chars(dt, thumbs)
+        else:
+            # pass exception up the call stack
+            LOG.error(str(ex))
+            raise Exception(ex)
 
 
 def get_concepts(request, text, apikey):
