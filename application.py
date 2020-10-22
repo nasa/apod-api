@@ -126,7 +126,6 @@ def _get_json_for_date(input_date, use_concept_tags, thumbs):
     use_default_today_date = False
     if not input_date:
         # fall back to using today's date IF they didn't specify a date
-        input_date = datetime.strftime(datetime.today(), '%Y-%m-%d')
         use_default_today_date = True
 
     # validate input date
