@@ -323,24 +323,24 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_d
 2. Now use the `get_data` function and pass your API key as the only argument. You can get the API key <a href="https://api.nasa.gov/#signUp">here</a>
 
 ```python
-response = nasa_apod_parser.get_data(<your_api_key>)
+response = apod_object_parser.get_data(<your_api_key>)
 ```
 
 3. Now you can use the following functions:
 
--> `get_date(response)`
+-> `apod_object_parser.get_date(response)`
 
--> `get_explaination(response)`
+-> `apod_object_parser.get_explaination(response)`
 
--> `get_hdurl(response)`
+-> `apod_object_parser.get_hdurl(response)`
 
--> `get_media_type(response)`
+-> `apod_object_parser.get_media_type(response)`
 
--> `get_service_version(response)`
+-> `apod_object_parser.get_service_version(response)`
 
--> `get_title(response)`
+-> `apod_object_parser.get_title(response)`
 
--> `get_url(response)`
+-> `apod_object_parser.get_url(response)`
 
 **for full docs and more functions visit the readme of  the apod parser by clicking <a href="apod_parser/apod_parser_readme.md">here</a>**
 
