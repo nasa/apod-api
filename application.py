@@ -298,7 +298,7 @@ def page_not_found(e):
     """
     Return a custom 404 error.
     """
-    LOG.info('Invalid page request: ' + e)
+    LOG.info('Invalid page request: ' + str(e))
     return _abort(404, 'Sorry, Nothing at this URL.', usage=True)
 
 
