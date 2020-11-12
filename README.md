@@ -26,8 +26,9 @@ No one watching this repository has anything to do with Astronomy Photo of the D
     2. [`virtualenv` environment](#virtualenv)
     3. [`conda` environment](#conda)
 2. [Docs](#docs)
-3. [Feedback](#feedback)
-4. [Author](#author)
+3. [APOD parser](#TheAPODParser)
+4. [Feedback](#feedback)
+5. [Author](#author)
 
 &nbsp;
 ## Getting started <a name="getting_started"></a>
@@ -311,8 +312,40 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_d
 </p>
 </details>
 
+## The APOD Parser<a name="TheAPODParser"></a>
+
+<i>The APOD Parser is not part of the API itself. </i> Rather is intended to be used for accessing the APOD API quickly with Python without writing much additional code yourself. It is found in the apod_parser folder.
+
+### Usage
+
+1. First import the `apod_object_parser.py` file.
+
+2. Now use the `get_data` function and pass your API key as the only argument. You can get the API key <a href="https://api.nasa.gov/#signUp">here</a>
+
+```python
+response = apod_object_parser.get_data(<your_api_key>)
+```
+
+3. Now you can use the following functions:
+
+-> `apod_object_parser.get_date(response)`
+
+-> `apod_object_parser.get_explaination(response)`
+
+-> `apod_object_parser.get_hdurl(response)`
+
+-> `apod_object_parser.get_media_type(response)`
+
+-> `apod_object_parser.get_service_version(response)`
+
+-> `apod_object_parser.get_title(response)`
+
+-> `apod_object_parser.get_url(response)`
+
+**for full docs and more functions visit the readme of  the apod parser by clicking <a href="apod_parser/apod_parser_readme.md">here</a>**
 
 ## Feedback <a name="feedback"></a>
+
 Star this repo if you found it useful. Use the github issue tracker to give
 feedback on this repo.
 
