@@ -314,7 +314,7 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_d
 
 ## The APOD Parser<a name="TheAPODParser"></a>
 
-The APOD Parser is intended to be used for accessing the APOD API quickly without writing unncessary code. it is present in the apod_parser folder.
+<i>The APOD Parser is not part of the API itself. </i> Rather is intended to be used for accessing the APOD API quickly with Python without writing much additional code yourself. It is found in the apod_parser folder.
 
 ### Usage
 
