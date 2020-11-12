@@ -355,5 +355,5 @@ feedback on this repo.
 - Please checkout the <a href="https://github.com/nasa/apod-api/graphs/contributors">contributers</a> to this repository on the righthand side of this page. 
 
 ## Contributing
-We do accept pull requests from the public. Please note that we're can be slow to respond, so be patient. Also, please note that the people with rights on this repository are not people who can debug problems with the APOD website itself. If you would like to contribute, right now we could use some attention to the tests. 
+We do accept pull requests from the public. Please note that we can be slow to respond. Please be patient. Also, the people with rights on this repository are not people who can debug problems with the APOD website itself. If you would like to contribute, right now we could use some attention to the tests. 
 
