@@ -354,5 +354,6 @@ feedback on this repo.
 - Justin Gosses (made changes to allow this repository to run more easily on AWS Elastic Beanstalk after heroku instance was shut-down)
 - Please checkout the <a href="https://github.com/nasa/apod-api/graphs/contributors">contributers</a> to this repository on the righthand side of this page. 
 
-We do accept pull requests from the public. Please not that sometimes we're a little slow to respond, so be patient. Also, please note that the people with rights on this repository are not people who can debug problems with the APOD website itself.
+## Contributing
+We do accept pull requests from the public. Please note that we're can be slow to respond, so be patient. Also, please note that the people with rights on this repository are not people who can debug problems with the APOD website itself. If you would like to contribute, right now we could use some attention to the tests. 
 
