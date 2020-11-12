@@ -1,7 +1,7 @@
 """
 A micro-service passing back enhanced information from Astronomy
 Picture of the Day (APOD).
-    
+
 Adapted from code in https://github.com/nasa/planetary-api
 Dec 1, 2015 (written by Dan Hammer)
 
@@ -18,10 +18,10 @@ sys.path.insert(0, "../lib")
 sys.path.insert(1, ".")
 
 from datetime import datetime, date
-from random import sample
-from flask import request, jsonify, render_template, Flask
+from random import shuffle
+from flask import request, jsonify, render_template, Flask, current_app
 from flask_cors import CORS
-from utility import parse_apod, get_concepts
+from apod.utility import parse_apod, get_concepts
 import logging
 
 #### added by justin for EB
@@ -31,9 +31,10 @@ application = Flask(__name__)
 CORS(application)
 
 LOG = logging.getLogger(__name__)
+# logging.basicConfig(level=logging.INFO)
 logging.basicConfig(level=logging.DEBUG)
 
-# this should reflect both this service and the backing 
+# this should reflect both this service and the backing
 # assorted libraries
 SERVICE_VERSION = 'v1'
 APOD_METHOD_NAME = 'apod'
@@ -91,7 +92,10 @@ def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False, thum
     served through the API.
     """
     try:
+        
         page_props = parse_apod(dt, use_default_today_date, thumbs)
+        if not page_props:
+            return None
         LOG.debug('managed to get apod page characteristics')
 
         if use_concept_tags:
@@ -131,6 +135,11 @@ def _get_json_for_date(input_date, use_concept_tags, thumbs):
 
     # get data
     data = _apod_handler(dt, use_concept_tags, use_default_today_date, thumbs)
+
+    # Handle case where no data is available
+    if not data:
+        return _abort(code=404, msg=f"No data available for date: {input_date}", usage=False)
+
     data['service_version'] = SERVICE_VERSION
 
     # return info as JSON
@@ -145,22 +154,27 @@ def _get_json_for_random_dates(count, use_concept_tags, thumbs):
     :param use_concept_tags:
     :return:
     """
-
     if count > 100 or count <= 0:
         raise ValueError('Count must be positive and cannot exceed 100')
-
     begin_ordinal = datetime(1995, 6, 16).toordinal()
     today_ordinal = datetime.today().toordinal()
 
-    date_range = range(begin_ordinal, today_ordinal + 1)
-    random_date_ordinals = sample(date_range, count)
+    random_date_ordinals = list(range(begin_ordinal, today_ordinal + 1))
+    shuffle(random_date_ordinals)
 
     all_data = []
     for date_ordinal in random_date_ordinals:
         dt = date.fromordinal(date_ordinal)
         data = _apod_handler(dt, use_concept_tags, date_ordinal == today_ordinal, thumbs)
+        
+        # Handle case where no data is available
+        if not data:
+            continue
+
         data['service_version'] = SERVICE_VERSION
         all_data.append(data)
+        if len(all_data) >= count:
+            break
 
     return jsonify(all_data)
 
@@ -199,7 +213,14 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
     while start_ordinal <= end_ordinal:
         # get data
         dt = date.fromordinal(start_ordinal)
+        
         data = _apod_handler(dt, use_concept_tags, start_ordinal == today_ordinal, thumbs)
+
+        # Handle case where no data is available
+        if not data:
+            start_ordinal += 1
+            continue
+
         data['service_version'] = SERVICE_VERSION
 
         if data['date'] == dt.isoformat():
@@ -222,6 +243,10 @@ def home():
                            service_url=request.host,
                            methodname=APOD_METHOD_NAME,
                            usage=_usage(joinstr='", "', prestr='"') + '"')
+
+@application.route('/static/<asset_path>')
+def serve_static(asset_path):
+    return current_app.send_static_file(asset_path)
 
 
 @application.route('/' + SERVICE_VERSION + '/' + APOD_METHOD_NAME + '/', methods=['GET'])
@@ -286,7 +311,4 @@ def application_error(e):
 
 
 if __name__ == '__main__':
-    application.run()
-    # httpd = make_server('', 8000, application)
-    # print("Serving on port 8000...")
-    # httpd.serve_forever()
+    application.run('0.0.0.0', port=5000)
