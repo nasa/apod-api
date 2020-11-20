@@ -126,12 +126,13 @@ def _get_json_for_date(input_date, use_concept_tags, thumbs):
     use_default_today_date = False
     if not input_date:
         # fall back to using today's date IF they didn't specify a date
-        input_date = datetime.strftime(datetime.today(), '%Y-%m-%d')
         use_default_today_date = True
+        dt = input_date  # None
 
     # validate input date
-    dt = datetime.strptime(input_date, '%Y-%m-%d').date()
-    _validate_date(dt)
+    else:
+        dt = datetime.strptime(input_date, '%Y-%m-%d').date()
+        _validate_date(dt)
 
     # get data
     data = _apod_handler(dt, use_concept_tags, use_default_today_date, thumbs)
