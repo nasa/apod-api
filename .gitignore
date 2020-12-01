@@ -10,3 +10,6 @@ lib/
 .DS_Store
 .idea/
 apod/__pycache__/
+.elasticbeanstalk/
+*.zip*
+Archive.zip
