@@ -3,7 +3,6 @@
 A microservice written in Python with the [Flask micro framework](http://flask.pocoo.org).
 
 ## NOTES: 
-
 ### Code re-organization has occurred [2020-05-04]!
 Code was reorganized to make it work more easily on AWS's Elastic Beanstalk service.
 
@@ -20,6 +19,7 @@ A very large number of people use the instance of this API that NASA has set up.
 #### Content Related Issues
 No one watching this repository has anything to do with Astronomy Photo of the Day website, so we're unable to deal with issues directly related to their content. Please contact them directly.
 
+
 # Table of contents
 1. [Getting Started](#getting_started)
     1. [Standard environment](#standard_env)
@@ -27,8 +27,9 @@ No one watching this repository has anything to do with Astronomy Photo of the D
     3. [`conda` environment](#conda)
 2. [Docs](#docs)
 3. [APOD parser](#TheAPODParser)
-4. [Feedback](#feedback)
-5. [Author](#author)
+4. [Deployed](#Deployed)
+5. [Feedback](#feedback)
+6. [Author](#author)
 
 &nbsp;
 ## Getting started <a name="getting_started"></a>
@@ -344,6 +345,11 @@ response = apod_object_parser.get_data(<your_api_key>)
 
 **for full docs and more functions visit the readme of  the apod parser by clicking <a href="apod_parser/apod_parser_readme.md">here</a>**
 
+## Deployed <a name="Deployed"></a>
+The deployed version of this API is based on the `eb` branch. The version that was deployed before that is in the `eb_previous` branch. The `master` branch is used as development as that's where most of the pull requests will come into anyways.
+
+This API is deployed on AWS using elastic beanstalk due to large number of people who use the service. However, if you're planning on using it just yourself, it is small enough to be stood up on a single micro EC2 or any other small size cloud compute machine.
+
 ## Feedback <a name="feedback"></a>
 
 Star this repo if you found it useful. Use the github issue tracker to give
@@ -355,5 +361,7 @@ feedback on this repo.
 - Please checkout the <a href="https://github.com/nasa/apod-api/graphs/contributors">contributers</a> to this repository on the righthand side of this page. 
 
 ## Contributing
-We do accept pull requests from the public. Please note that we can be slow to respond. Please be patient. Also, the people with rights on this repository are not people who can debug problems with the APOD website itself. If you would like to contribute, right now we could use some attention to the tests. 
+We do accept pull requests from the public. Please note that we can be slow to respond. Please be patient. 
+
+Also, **the people with rights on this repository are not people who can debug problems with the APOD website itself**. If you would like to contribute, right now we could use some attention to the tests. 
 
