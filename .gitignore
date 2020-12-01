@@ -13,3 +13,4 @@ apod/__pycache__/
 .elasticbeanstalk/
 *.zip*
 Archive.zip
+venv/

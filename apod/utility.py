@@ -7,7 +7,7 @@ Created on Mar 24, 2017
 """
 
 from bs4 import BeautifulSoup
-from datetime import timedelta
+import datetime
 import requests
 import logging
 import json
@@ -53,10 +53,27 @@ def _get_last_url(data):
 
 def _get_apod_chars(dt, thumbs):
     media_type = 'image'
-    date_str = dt.strftime('%y%m%d')
-    apod_url = '%sap%s.html' % (BASE, date_str)
+    if dt:
+        date_str = dt.strftime('%y%m%d')
+        apod_url = '%sap%s.html' % (BASE, date_str)
+    else:
+        apod_url = '%sastropix.html' % BASE
     LOG.debug('OPENING URL:' + apod_url)
-    soup = BeautifulSoup(requests.get(apod_url).text, 'html.parser')
+    res = requests.get(apod_url)
+    
+    if res.status_code == 404:
+        return None
+        # LOG.error(f'No APOD entry for URL: {apod_url}')
+        # default_obj_path = 'static/default_apod_object.json'
+        # LOG.debug(f'Loading default APOD response from {default_obj_path}')
+        # with open(default_obj_path, 'r') as f:
+        #     default_obj_props = json.load(f)
+
+        # default_obj_props['date'] = dt.strftime('%Y-%m-%d')
+
+        # return default_obj_props
+
+    soup = BeautifulSoup(res.text, 'html.parser')
     LOG.debug('getting the data url')
     hd_data = None
     if soup.img:
@@ -88,7 +105,10 @@ def _get_apod_chars(dt, thumbs):
     props['media_type'] = media_type
     if data:
         props['url'] = _get_last_url(data)
-    props['date'] = dt.isoformat()
+    if dt:
+        props['date'] = dt.strftime('%Y-%m-%d')
+    else:
+        props['date'] = _date(soup)
 
     if hd_data:
         props['hdurl'] = _get_last_url(hd_data)
@@ -233,6 +253,36 @@ def _explanation(soup):
     return s
 
 
+def _date(soup):
+    """
+    Accepts a BeautifulSoup object for the APOD HTML page and returns the
+    date of the APOD image.
+    """
+    LOG.debug('getting the date from soup data.')
+    _today = datetime.date.today()
+    for line in soup.text.split('\n'):
+        today_year = str(_today.year)
+        yesterday_year = str((_today-datetime.timedelta(days=1)).year)
+        # Looks for the first line that starts with the current year.
+        # This also checks yesterday's year so it doesn't break on January 1st at 00:00 UTC
+        # before apod.nasa.gov uploads a new image.
+        if line.startswith(today_year) or line.startswith(yesterday_year):
+            LOG.debug('found possible date match: ' + line)
+            # takes apart the date string and turns it into a datetime
+            try:
+                year, month, day = line.split()
+                year = int(year)
+                month = ['january', 'february', 'march', 'april',
+                         'may', 'june', 'july', 'august',
+                         'september', 'october', 'november', 'december'
+                         ].index(month.lower()) + 1
+                day = int(day)
+                return datetime.date(year=year, month=month, day=day).strftime('%Y-%m-%d')
+            except:
+                LOG.debug('unable to retrieve date from line: ' + line)
+    raise Exception('Date not found in soup data.')
+
+
 def parse_apod(dt, use_default_today_date=False, thumbs=False):
     """
     Accepts a date in '%Y-%m-%d' format. Returns the URL of the APOD image
@@ -251,9 +301,9 @@ def parse_apod(dt, use_default_today_date=False, thumbs=False):
         # service (can happen because they are deployed in different
         # timezones). Use the fallback of prior day's date
 
-        if use_default_today_date:
+        if use_default_today_date and dt:
             # try to get the day before
-            dt = dt - timedelta(days=1)
+            dt = dt - datetime.timedelta(days=1)
             return _get_apod_chars(dt, thumbs)
         else:
             # pass exception up the call stack

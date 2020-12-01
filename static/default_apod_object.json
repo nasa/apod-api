@@ -1,0 +1,7 @@
+{
+  "explanation": "This is a fallback image used in the case where there is a missing/corrupted asset on apod.nasa.gov. Image source: https://en.wikipedia.org/wiki/File:Black_Hole_in_the_universe.jpg",
+  "hdurl": "https://api.nasa.gov/planetary/apod/static/default_apod_image.jpg",
+  "media_type": "image",
+  "title": "Default Image",
+  "url": "https://api.nasa.gov/planetary/apod/static/default_apod_image.jpg"
+}
