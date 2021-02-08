@@ -1,6 +1,6 @@
 # Astronomy Picture of the Day (APOD) microservice
 
-A microservice written in Python with the [Flask micro framework](http://flask.pocoo.org).
+A microservice written in Python with the [Flask micro framework](http://flask.pocoo.org) to return photos and text from the NASA astronomy photo of the day webpage.
 
 ## NOTES: 
 ### Code re-organization has occurred [2020-05-04]!
