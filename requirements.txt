@@ -17,3 +17,5 @@ setupext-janitor==1.0.0
 bs4==0.0.1
 mock>=3.0.0
 Pillow==7.1.2
+urllib3~=1.26.4
+setuptools~=56.0.0

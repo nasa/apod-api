@@ -13,6 +13,7 @@ import logging
 import json
 import re
 import urllib3 as urllib
+
 # import urllib.request
 
 LOG = logging.getLogger(__name__)
@@ -46,10 +47,12 @@ def _get_thumbs(data):
 
     return video_thumb
 
+
 # function that returns only last URL if there are multiple URLs stacked together
 def _get_last_url(data):
     regex = re.compile("(?:.(?!http[s]?://))+$")
     return regex.findall(data)[0]
+
 
 def _get_apod_chars(dt, thumbs):
     media_type = 'image'
@@ -60,7 +63,7 @@ def _get_apod_chars(dt, thumbs):
         apod_url = '%sastropix.html' % BASE
     LOG.debug('OPENING URL:' + apod_url)
     res = requests.get(apod_url)
-    
+
     if res.status_code == 404:
         return None
         # LOG.error(f'No APOD entry for URL: {apod_url}')
@@ -95,10 +98,8 @@ def _get_apod_chars(dt, thumbs):
         media_type = 'other'
         data = ''
 
-    props = {}
+    props = {'explanation': _explanation(soup), 'title': _title(soup)}
 
-    props['explanation'] = _explanation(soup)
-    props['title'] = _title(soup)
     copyright_text = _copyright(soup)
     if copyright_text:
         props['copyright'] = copyright_text
@@ -130,7 +131,7 @@ def _title(soup):
     try:
         # Handler for later APOD entries
         number_of_center_elements = len(soup.find_all('center'))
-        if(number_of_center_elements == 2):
+        if number_of_center_elements == 2:
             center_selection = soup.find_all('center')[0]
             bold_selection = center_selection.find_all('b')[0]
             title = bold_selection.text.strip(' ')
@@ -146,7 +147,7 @@ def _title(soup):
                 title = title.encode('latin1').decode('cp1252')
             except Exception as ex:
                 LOG.error(str(ex))
-        
+
         return title
     except Exception:
         # Handler for early APOD entries
@@ -262,7 +263,7 @@ def _date(soup):
     _today = datetime.date.today()
     for line in soup.text.split('\n'):
         today_year = str(_today.year)
-        yesterday_year = str((_today-datetime.timedelta(days=1)).year)
+        yesterday_year = str((_today - datetime.timedelta(days=1)).year)
         # Looks for the first line that starts with the current year.
         # This also checks yesterday's year so it doesn't break on January 1st at 00:00 UTC
         # before apod.nasa.gov uploads a new image.
