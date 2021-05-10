@@ -365,3 +365,6 @@ We do accept pull requests from the public. Please note that we can be slow to r
 
 Also, **the people with rights on this repository are not people who can debug problems with the APOD website itself**. If you would like to contribute, right now we could use some attention to the tests. 
 
+## Links
+
+- [YouTube Embedded Players and Player Parameters](https://developers.google.com/youtube/player_parameters)
