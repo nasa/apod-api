@@ -313,6 +313,9 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_d
 </p>
 </details>
 
+#### Copyright
+If you are re-displaying imagery, you may want to check for the presence of the copyright. Anything without a copyright returned field is generally NASA and in the public domain. Please see the <a href=https://apod.nasa.gov/apod/lib/about_apod.html>"About image permissions"</a> section on the main Astronomy Photo of the Day site for more information.
+
 ## The APOD Parser<a name="TheAPODParser"></a>
 
 <i>The APOD Parser is not part of the API itself. </i> Rather is intended to be used for accessing the APOD API quickly with Python without writing much additional code yourself. It is found in the apod_parser folder.
