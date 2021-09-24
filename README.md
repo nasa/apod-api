@@ -134,8 +134,9 @@ docker run -p 5000:5000 apod-api
 There is only one endpoint in this service which takes 2 optional fields
 as parameters to a http GET request. A JSON dictionary is returned nominally.
 
-**Fields**
+#### URL Search Params | query string parameters
 
+- `api_key` | demo: `DEMO_KEY` | https://api.nasa.gov/#signUp
 - `date` A string in YYYY-MM-DD format indicating the date of the APOD image (example: 2014-11-03).  Defaults to today's date.  Must be after 1995-06-16, the first day an APOD picture was posted.  There are no images for tomorrow available through this API.
 - `concept_tags` A boolean `True|False` indicating whether concept tags should be returned with the rest of the response.  The concept tags are not necessarily included in the explanation, but rather derived from common search tags that are associated with the description text.  (Better than just pure text search.)  Defaults to False.
 - `hd` A boolean `True|False` parameter indicating whether or not high-resolution images should be returned. This is present for legacy purposes, it is always ignored by the service and high-resolution urls are returned regardless.
