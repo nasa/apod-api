@@ -142,7 +142,7 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 - `count` A positive integer, no greater than 100. If this is specified then `count` randomly chosen images will be returned in a JSON array. Cannot be used in conjunction with `date` or `start_date` and `end_date`.
 - `start_date` A string in YYYY-MM-DD format indicating the start of a date range. All images in the range from `start_date` to `end_date` will be returned in a JSON array. Cannot be used with `date`.
 - `end_date` A string in YYYY-MM-DD format indicating that end of a date range. If `start_date` is specified without an `end_date` then `end_date` defaults to the current date.
-- `thumbs` If set to `true|false`, the API returns URL of video thumbnail. If an APOD is not a video, this parameter is ignored.
+- `thumbs` A boolean parameter `True|False` inidcating whether the API should return a thumbnail image URL for video files. If set to `True`, the API returns URL of video thumbnail. If an APOD is not a video, this parameter is ignored.
 
 **Returned fields**
 
