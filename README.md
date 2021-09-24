@@ -162,7 +162,7 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 **Example**
 
 ```bash
-localhost:5000/v1/apod?date=2014-10-01&concept_tags=True
+localhost:5000/v1/apod?api_key=DEMO_KEY&date=2014-10-01&concept_tags=True
 ```
 <details><summary>See Return Object</summary>
 <p>
