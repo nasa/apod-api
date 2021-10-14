@@ -59,7 +59,7 @@ setup(
     maintainer_email='brian.a.thomas@nasa.gov',
 
     packages=find_packages(exclude=('tests', 'tests.*')),
-    license='Apache2 License',
+    license='Apache-2.0 License',
 
     include_package_data=True,
 
