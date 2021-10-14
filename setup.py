@@ -1,6 +1,7 @@
 from os.path import dirname, join
 from setuptools import setup, find_packages, Command
 
+
 with open('requirements.txt') as f:
     reqs = f.read().splitlines()
 
