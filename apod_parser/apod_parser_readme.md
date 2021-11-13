@@ -7,13 +7,12 @@ get a Nasa api key by clicking <a href="https://api.nasa.gov/#signUp">here</a>.
 ```python
 import apod_object_parser
 ```
-2. Now call the `get_data` function and pass the `nasa api key` as the argument. Note api_key is a string. The response returned will be a Dictionary. Now you can parse the dictionary too
+2. Now call the `get_data` function and pass the `nasa api key` as the argument. Note, the api key is a string. The response returned will be a dictionary. Now you can parse the dictionary too
 
 ```python 
-response = apod_object_parser.get_data(##Pass In Your API key here)
+response = apod_object_parser.get_data("Pass In Your API key here")
 ```
 ### get_date
-
 the `get_date` function takes the dictionary we got above and returns the date.
 
 ```python
@@ -44,7 +43,7 @@ the `get_url` function takes the dictionary we got above and returns the Standar
 date = apod_object_parser.get_hdurl(response)
 ```
 ### get_media_type
-the `get_media_type` function takes the dictionary we got above and returns the media type the file (might be a video of a image).
+the `get_media_type` function takes the dictionary we got above and returns the media type the file (might be a video or an image).
 
 ```python
 date = apod_object_parser.get_hdurl(response)
@@ -54,13 +53,13 @@ date = apod_object_parser.get_hdurl(response)
 there are also other functions that might help you in situations
 
 ### download_image
-the `download_image` finction takes the url (hdurl or url) and the date from the function `get_date` and downloads the image in the current directory and with the file name of the date. the image downloaded is in the .jpg format
+the `download_image` function takes the url (hdurl or url) and the date from the function `get_date` and downloads the image in the current directory and with the file name of the date. The image downloaded is in the .jpg format.
 ```python
 apod_object_parser.download_image(url, date)
 ```
 
 ### convert_image
-sometimes the image we downloaded above might not be in the right format (.jpg) so you may call `convert_image` function to convert the image into .png. takes the `image_path` parameter which is the filepath.
+sometimes the image we downloaded above might not be in the right format (.jpg) so you may call `convert_image` function to convert the image into .png. Takes the `image_path` parameter which is the filepath.
 ```python 
 apod_object_parser.convert_image(image_path)
 ```
