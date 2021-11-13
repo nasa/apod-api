@@ -3,6 +3,7 @@ import json
 import os
 from PIL import Image
 
+
 def get_copyright(response):
     return response['copyright']
 
@@ -14,39 +15,34 @@ def get_data(api_key):
 
 
 def get_date(response):
-    date = response['date']
-    return date
+    return response['date']
 
 
 def get_explanation(response):
-    explanation = response['explanation']
-    return explanation
+    return response['explanation']
 
 
 def get_hdurl(response):
-    hdurl = response['hdurl']
-    return hdurl
+    return response['hdurl']
 
 
 def get_media_type(response):
-    media_type = response['media_type']
-    return media_type
+    return response['media_type']
+
 
 def get_service_version(response): 
-    service_version = response['service_version']
-    return service_version
+    return response['service_version']
 
 
 def get_title(response):
-    service_version = response['title']
-    return service_version
+    return response['title']
+
 
 def get_url(response):
-    url = response['url']
-    return url
+    return response['url']
 
 def download_image(url, date):
-    if os.path.isfile(f'{date}.png') == False:
+    if not os.path.isfile(f'{date}.png'):
         raw_image = requests.get(url).content
         with open(f'{date}.jpg', 'wb') as file:
             file.write(raw_image)
