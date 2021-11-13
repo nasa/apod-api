@@ -3,6 +3,10 @@ import json
 import os
 from PIL import Image
 
+def get_copyright(response):
+    return response['copyright']
+
+
 def get_data(api_key):
     raw_response = requests.get(f'https://api.nasa.gov/planetary/apod?api_key={api_key}').text
     response = json.loads(raw_response)
