@@ -14,9 +14,9 @@ def get_date(response):
     return date
 
 
-def get_explaination(response):
-    explaination = response['explanation']
-    return explaination
+def get_explanation(response):
+    explanation = response['explanation']
+    return explanation
 
 
 def get_hdurl(response):
