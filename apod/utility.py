@@ -227,7 +227,8 @@ def _explanation(soup):
     s = soup.find_all('p')[2].text
     s = s.replace('\n', ' ')
     s = s.replace('  ', ' ')
-    s = s.strip(' ').strip('Explanation: ')
+    s = s.strip(' ')
+    s = s.replace('Explanation: ', '')
     s = s.split(' Tomorrow\'s picture')[0]
     s = s.strip(' ')
     if s == '':
