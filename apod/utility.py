@@ -12,8 +12,7 @@ import requests
 import logging
 import json
 import re
-import urllib3 as urllib
-
+import urllib3
 # import urllib.request
 
 LOG = logging.getLogger(__name__)
@@ -22,6 +21,8 @@ logging.basicConfig(level=logging.WARN)
 # location of backing APOD service
 BASE = 'https://apod.nasa.gov/apod/'
 
+# Create urllib3 Pool Manager
+http = urllib3.PoolManager()
 
 def _get_thumbs(data):
     """
@@ -40,9 +41,9 @@ def _get_thumbs(data):
         vimeo_id_regex = re.compile("(?:/video/)(\d+)")
         vimeo_id = vimeo_id_regex.findall(data)[0]
         # make an API call to get thumbnail URL
-        with urllib.request.urlopen("https://vimeo.com/api/v2/video/" + vimeo_id + ".json") as url:
-            data = json.loads(url.read().decode())
-            video_thumb = data[0]['thumbnail_large']
+        vimeo_request = http.request("GET", "https://vimeo.com/api/v2/video/" + vimeo_id + ".json")
+        data = json.loads(vimeo_request.data.decode('utf-8'))
+        video_thumb = data[0]['thumbnail_large']
     else:
         # the thumbs parameter is True, but the APOD for the date is not a video, output nothing
         video_thumb = ""

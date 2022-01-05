@@ -29,7 +29,7 @@ import logging
 # from wsgiref.simple_server import make_server
 
 application = Flask(__name__)
-CORS(application)
+CORS(application, resources={r"/*": {"expose_headers": ["X-RateLimit-Limit","X-RateLimit-Remaining"]} })
 
 LOG = logging.getLogger(__name__)
 # logging.basicConfig(level=logging.INFO)
