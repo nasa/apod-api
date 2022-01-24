@@ -4,9 +4,8 @@ import os
 from PIL import Image
 
 def get_data(api_key):
-    raw_response = requests.get(f'https://api.nasa.gov/planetary/apod?api_key={api_key}').text
-    response = json.loads(raw_response)
-    return response
+    response = requests.get(f'https://api.nasa.gov/planetary/apod?api_key={api_key}').json()
+    return json.dumps(response, indent=4)
 
 
 def get_date(response):
