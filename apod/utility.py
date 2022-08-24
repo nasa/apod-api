@@ -24,8 +24,10 @@ BASE = 'https://apod.nasa.gov/apod/'
 # Create urllib3 Pool Manager
 http = urllib3.PoolManager()
 
-# function for getting video thumbnails
 def _get_thumbs(data):
+    """
+    Function for getting video thumbnails
+    """
     global video_thumb
     if "youtube" in data or "youtu.be" in data:
         # get ID from YouTube URL
@@ -48,21 +50,36 @@ def _get_thumbs(data):
 
     return video_thumb
 
-# function that returns only last URL if there are multiple URLs stacked together
+
 def _get_last_url(data):
+    """
+    Function that returns only last URL if there are multiple URLs stacked together
+    """
     regex = re.compile("(?:.(?!http[s]?://))+$")
     return regex.findall(data)[0]
 
-def _get_apod_chars(dt, thumbs):
-    media_type = 'image'
+
+def _format_url(dt):
+    """
+    Returns url for APOD page
+    """
     if dt:
         date_str = dt.strftime('%y%m%d')
         apod_url = '%sap%s.html' % (BASE, date_str)
     else:
         apod_url = '%sastropix.html' % BASE
+    return apod_url
+
+
+def _get_apod_chars(dt, thumbs):
+    """
+    Gets data from APOD page
+    """
+    media_type = 'image'
+    apod_url = _format_url(dt)
     LOG.debug('OPENING URL:' + apod_url)
     res = requests.get(apod_url)
-    
+
     if res.status_code == 404:
         return None
         # LOG.error(f'No APOD entry for URL: {apod_url}')
@@ -97,10 +114,8 @@ def _get_apod_chars(dt, thumbs):
         media_type = 'other'
         data = ''
 
-    props = {}
+    props = {'explanation': _explanation(soup), 'title': _title(soup)}
 
-    props['explanation'] = _explanation(soup)
-    props['title'] = _title(soup)
     copyright_text = _copyright(soup)
     if copyright_text:
         props['copyright'] = copyright_text
@@ -132,7 +147,7 @@ def _title(soup):
     try:
         # Handler for later APOD entries
         number_of_center_elements = len(soup.find_all('center'))
-        if(number_of_center_elements == 2):
+        if (number_of_center_elements == 2):
             center_selection = soup.find_all('center')[0]
             bold_selection = center_selection.find_all('b')[0]
             title = bold_selection.text.strip(' ')
@@ -148,7 +163,7 @@ def _title(soup):
                 title = title.encode('latin1').decode('cp1252')
             except Exception as ex:
                 LOG.error(str(ex))
-        
+
         return title
     except Exception:
         # Handler for early APOD entries
@@ -264,7 +279,7 @@ def _date(soup):
     _today = datetime.date.today()
     for line in soup.text.split('\n'):
         today_year = str(_today.year)
-        yesterday_year = str((_today-datetime.timedelta(days=1)).year)
+        yesterday_year = str((_today - datetime.timedelta(days=1)).year)
         # Looks for the first line that starts with the current year.
         # This also checks yesterday's year so it doesn't break on January 1st at 00:00 UTC
         # before apod.nasa.gov uploads a new image.
@@ -285,7 +300,7 @@ def _date(soup):
     raise Exception('Date not found in soup data.')
 
 
-def parse_apod(dt, use_default_today_date=False, thumbs=False):
+def _image_url(dt, use_default_today_date=False, thumbs=False):
     """
     Accepts a date in '%Y-%m-%d' format. Returns the URL of the APOD image
     of that day, noting that
@@ -294,8 +309,8 @@ def parse_apod(dt, use_default_today_date=False, thumbs=False):
     LOG.debug('apod chars called date:' + str(dt))
 
     try:
-        return _get_apod_chars(dt, thumbs)
-
+        data = _get_apod_chars(dt, thumbs)
+        return data['url']
     except Exception as ex:
 
         # handle edge case where the service local time

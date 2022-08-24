@@ -13,8 +13,9 @@ adapted for AWS Elastic Beanstalk deployment
 @author=JustinGOSSES @email=justin.c.gosses@nasa.gov
 """
 import sys
+
 sys.path.insert(0, "../lib")
-### justin edit
+# justin edit
 sys.path.insert(1, ".")
 
 from datetime import datetime, date
@@ -24,8 +25,8 @@ from flask_cors import CORS
 from apod.utility import parse_apod, get_concepts
 import logging
 
-#### added by justin for EB
-#from wsgiref.simple_server import make_server
+# added by justin for EB
+# from wsgiref.simple_server import make_server
 
 application = Flask(__name__)
 CORS(application, resources={r"/*": {"expose_headers": ["X-RateLimit-Limit","X-RateLimit-Remaining"]} })
@@ -44,9 +45,9 @@ RESULTS_DICT = dict([])
 try:
     with open('alchemy_api.key', 'r') as f:
         ALCHEMY_API_KEY = f.read()
-#except FileNotFoundError:
+# except FileNotFoundError:
 except IOError:
-     LOG.info('WARNING: NO alchemy_api.key found, concept_tagging is NOT supported')
+    LOG.info('WARNING: NO alchemy_api.key found, concept_tagging is NOT supported')
 
 
 def _abort(code, msg, usage=True):
@@ -92,7 +93,7 @@ def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False, thum
     served through the API.
     """
     try:
-        
+
         page_props = parse_apod(dt, use_default_today_date, thumbs)
         if not page_props:
             return None
@@ -182,7 +183,7 @@ def _get_json_for_random_dates(count, use_concept_tags, thumbs):
     for date_ordinal in random_date_ordinals:
         dt = date.fromordinal(date_ordinal)
         data = _apod_handler(dt, use_concept_tags, date_ordinal == today_ordinal, thumbs)
-        
+
         # Handle case where no data is available
         if not data:
             continue
@@ -229,7 +230,7 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
     while start_ordinal <= end_ordinal:
         # get data
         dt = date.fromordinal(start_ordinal)
-        
+
         data = _apod_handler(dt, use_concept_tags, start_ordinal == today_ordinal, thumbs)
 
         # Handle case where no data is available
@@ -259,6 +260,7 @@ def home():
                            service_url=request.host,
                            methodname=APOD_METHOD_NAME,
                            usage=_usage(joinstr='", "', prestr='"') + '"')
+
 
 @application.route('/static/<asset_path>')
 def serve_static(asset_path):
