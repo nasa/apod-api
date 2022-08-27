@@ -14,7 +14,7 @@ The changes over previous version were :
 You can find a frozen version of the previous code in the branch called <a href="https://github.com/nasa/apod-api/tree/prevCodeOrganization">"prevCodeOrganization"</a>
 
 #### API Reliability
-A very large number of people use the instance of this API that NASA has set up. If you need a extremely reliable version of this API, you likely want to stand up your own version of the API. You can do that with this code! All information that this API returns is actually just grabbed from the <a href='https://apod.nasa.gov/apod/astropix.html'>Astronomy Photo of the Day Website</a> (APOD).
+A very large number of people use the instance of this API that NASA has set up. If you need an extremely reliable version of this API, you likely want to stand up your own version of the API. You can do that with this code! All information that this API returns is actually just grabbed from the <a href='https://apod.nasa.gov/apod/astropix.html'>Astronomy Photo of the Day Website</a> (APOD).
 
 #### Content Related Issues
 No one watching this repository has anything to do with Astronomy Photo of the Day website, so we're unable to deal with issues directly related to their content. Please contact them directly.
@@ -132,18 +132,18 @@ docker run -p 5000:5000 apod-api
 ### Endpoint: `/<version>/apod`
 
 There is only one endpoint in this service which takes 2 optional fields
-as parameters to a http GET request. A JSON dictionary is returned nominally.
+as parameters to an http GET request. A JSON dictionary is returned nominally.
 
 #### URL Search Params | query string parameters
 
 - `api_key` | demo: `DEMO_KEY` | https://api.nasa.gov/#signUp
 - `date` A string in YYYY-MM-DD format indicating the date of the APOD image (example: 2014-11-03).  Defaults to today's date.  Must be after 1995-06-16, the first day an APOD picture was posted.  There are no images for tomorrow available through this API.
 - `concept_tags` A boolean `True|False` indicating whether concept tags should be returned with the rest of the response.  The concept tags are not necessarily included in the explanation, but rather derived from common search tags that are associated with the description text.  (Better than just pure text search.)  Defaults to False.
-- `hd` A boolean `True|False` parameter indicating whether or not high-resolution images should be returned. This is present for legacy purposes, it is always ignored by the service and high-resolution urls are returned regardless.
+- `hd` A boolean `True|False` parameter indicating whether or not high-resolution images should be returned. This is present for legacy purposes; it is always ignored by the service and high-resolution urls are returned regardless.
 - `count` A positive integer, no greater than 100. If this is specified then `count` randomly chosen images will be returned in a JSON array. Cannot be used in conjunction with `date` or `start_date` and `end_date`.
 - `start_date` A string in YYYY-MM-DD format indicating the start of a date range. All images in the range from `start_date` to `end_date` will be returned in a JSON array. Cannot be used with `date`.
 - `end_date` A string in YYYY-MM-DD format indicating that end of a date range. If `start_date` is specified without an `end_date` then `end_date` defaults to the current date.
-- `thumbs` A boolean parameter `True|False` inidcating whether the API should return a thumbnail image URL for video files. If set to `True`, the API returns URL of video thumbnail. If an APOD is not a video, this parameter is ignored.
+- `thumbs` A boolean parameter `True|False` indicating whether the API should return a thumbnail image URL for video files. If set to `True`, the API returns URL of video thumbnail. If an APOD is not a video, this parameter is ignored.
 
 **Returned fields**
 
@@ -319,7 +319,7 @@ If you are re-displaying imagery, you may want to check for the presence of the 
 
 ## The APOD Parser<a name="TheAPODParser"></a>
 
-<i>The APOD Parser is not part of the API itself. </i> Rather is intended to be used for accessing the APOD API quickly with Python without writing much additional code yourself. It is found in the apod_parser folder.
+<i>The APOD Parser is not part of the API itself. </i> Rather it is intended to be used for accessing the APOD API quickly with Python without writing much additional code yourself. It is found in the apod_parser folder.
 
 ### Usage
 
@@ -347,10 +347,10 @@ response = apod_object_parser.get_data(<your_api_key>)
 
 -> `apod_object_parser.get_url(response)`
 
-**for full docs and more functions visit the readme of  the apod parser by clicking <a href="apod_parser/apod_parser_readme.md">here</a>**
+**for full docs and more functions visit the readme of the apod parser by clicking <a href="apod_parser/apod_parser_readme.md">here</a>**
 
 ## Deployed <a name="Deployed"></a>
-The deployed version of this API is based on the `eb` branch. The version that was deployed before that is in the `eb_previous` branch. The `master` branch is used as development as that's where most of the pull requests will come into anyways.
+The deployed version of this API is based on the `eb` branch. The version that was deployed before that is in the `eb_previous` branch. The `master` branch is used as development as that's where most of the pull requests will come into anyway.
 
 This API is deployed on AWS using elastic beanstalk due to large number of people who use the service. However, if you're planning on using it just yourself, it is small enough to be stood up on a single micro EC2 or any other small size cloud compute machine.
 
