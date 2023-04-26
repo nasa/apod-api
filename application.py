@@ -27,63 +27,63 @@ import logging
 #### added by justin for EB
 #from wsgiref.simple_server import make_server
 
-application = Flask(__name__)
-CORS(application, resources={r"/*": {"expose_headers": ["X-RateLimit-Limit","X-RateLimit-Remaining"]} })
+application = Flask(__name__) # creating Flask 
+CORS(application, resources={r"/*": {"expose_headers": ["X-RateLimit-Limit","X-RateLimit-Remaining"]} }) # configuring application
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__) # creating logger
 # logging.basicConfig(level=logging.INFO)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG) # configures logger
 
 # this should reflect both this service and the backing
 # assorted libraries
-SERVICE_VERSION = 'v1'
-APOD_METHOD_NAME = 'apod'
-ALLOWED_APOD_FIELDS = ['concept_tags', 'date', 'hd', 'count', 'start_date', 'end_date', 'thumbs']
-ALCHEMY_API_KEY = None
-RESULTS_DICT = dict([])
+SERVICE_VERSION = 'v1' # setting service version
+APOD_METHOD_NAME = 'apod' # setting apod name
+ALLOWED_APOD_FIELDS = ['concept_tags', 'date', 'hd', 'count', 'start_date', 'end_date', 'thumbs'] # setting fields for apod
+ALCHEMY_API_KEY = None # setting api key
+RESULTS_DICT = dict([]) # creating empty dict
 try:
     with open('alchemy_api.key', 'r') as f:
-        ALCHEMY_API_KEY = f.read()
+        ALCHEMY_API_KEY = f.read() # opens and reads api key file
 #except FileNotFoundError:
 except IOError:
-     LOG.info('WARNING: NO alchemy_api.key found, concept_tagging is NOT supported')
+     LOG.info('WARNING: NO alchemy_api.key found, concept_tagging is NOT supported') # raises exception if error
 
 
 def _abort(code, msg, usage=True):
     if usage:
-        msg += " " + _usage() + "'"
+        msg += " " + _usage() + "'" # joining message with allowed requests
 
-    response = jsonify(service_version=SERVICE_VERSION, msg=msg, code=code)
-    response.status_code = code
-    LOG.debug(str(response))
+    response = jsonify(service_version=SERVICE_VERSION, msg=msg, code=code) # creates JSON response
+    response.status_code = code # setting value of response to code parameter
+    LOG.debug(str(response)) # logs response
 
     return response
 
 
 def _usage(joinstr="', '", prestr="'"):
     return 'Allowed request fields for ' + APOD_METHOD_NAME + ' method are ' + prestr + joinstr.join(
-        ALLOWED_APOD_FIELDS)
+        ALLOWED_APOD_FIELDS) # concatenating string for useage response
 
 
 def _validate(data):
-    LOG.debug('_validate(data) called')
+    LOG.debug('_validate(data) called') # logging message calling validate func
     for key in data:
-        if key not in ALLOWED_APOD_FIELDS:
+        if key not in ALLOWED_APOD_FIELDS: # checking if key in apod fields
             return False
     return True
 
 
 def _validate_date(dt):
-    LOG.debug('_validate_date(dt) called')
-    today = datetime.today().date()
+    LOG.debug('_validate_date(dt) called') # logging func call
+    today = datetime.today().date() # getting todays date
     begin = datetime(1995, 6, 16).date()  # first APOD image date
 
     # validate input
-    if (dt > today) or (dt < begin):
+    if (dt > today) or (dt < begin): # checking if valid date in range
         today_str = today.strftime('%b %d, %Y')
         begin_str = begin.strftime('%b %d, %Y')
 
-        raise ValueError('Date must be between %s and %s.' % (begin_str, today_str))
+        raise ValueError('Date must be between %s and %s.' % (begin_str, today_str)) # error when date isn't valid
 
 
 def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False, thumbs=False):
@@ -93,16 +93,16 @@ def _apod_handler(dt, use_concept_tags=False, use_default_today_date=False, thum
     """
     try:
         
-        page_props = parse_apod(dt, use_default_today_date, thumbs)
+        page_props = parse_apod(dt, use_default_today_date, thumbs) # attempt to retreive apod page chars
         if not page_props:
             return None
-        LOG.debug('managed to get apod page characteristics')
+        LOG.debug('managed to get apod page characteristics') # logger message
 
         if use_concept_tags:
             if ALCHEMY_API_KEY is None:
-                page_props['concepts'] = 'concept_tags functionality turned off in current service'
+                page_props['concepts'] = 'concept_tags functionality turned off in current service' # if concept tags are off
             else:
-                page_props['concepts'] = get_concepts(request, page_props['explanation'], ALCHEMY_API_KEY)
+                page_props['concepts'] = get_concepts(request, page_props['explanation'], ALCHEMY_API_KEY) # getting concepts
 
         return page_props
 
@@ -129,33 +129,33 @@ def _get_json_for_date(input_date, use_concept_tags, thumbs):
         use_default_today_date = True
         dt = input_date  # None
         key = datetime.utcnow().date()
-        key = str(key.year)+'y'+str(key.month)+'m'+str(key.day)+'d'+str(use_concept_tags)+str(thumbs)
+        key = str(key.year)+'y'+str(key.month)+'m'+str(key.day)+'d'+str(use_concept_tags)+str(thumbs) # getting & appending key
 
     # validate input date
     else:
 
-        dt = datetime.strptime(input_date, '%Y-%m-%d').date()
+        dt = datetime.strptime(input_date, '%Y-%m-%d').date() # checking date validity
         _validate_date(dt)
         key = str(dt.year)+'y'+str(dt.month)+'m'+str(dt.day)+'d'+str(use_concept_tags)+str(thumbs)
 
     # get data
     if key in RESULTS_DICT.keys():
-        data = RESULTS_DICT[key]
+        data = RESULTS_DICT[key] # getting key from dict
     else:
         data = _apod_handler(dt, use_concept_tags, use_default_today_date, thumbs)
         
 
     # Handle case where no data is available
     if not data:
-        return _abort(code=404, msg=f"No data available for date: {input_date}", usage=False)
+        return _abort(code=404, msg=f"No data available for date: {input_date}", usage=False) # no data available msg
     
 
     data['service_version'] = SERVICE_VERSION
 
     #Volatile caching dict
-    datadate =  datetime.strptime(data['date'], '%Y-%m-%d').date()
+    datadate =  datetime.strptime(data['date'], '%Y-%m-%d').date() # getting date
     key = str(datadate.year)+'y'+str(datadate.month)+'m'+str(datadate.day)+'d'+str(use_concept_tags)+str(thumbs)
-    RESULTS_DICT[key] = data
+    RESULTS_DICT[key] = data # adding data to dict
 
 
     # return info as JSON
@@ -171,12 +171,12 @@ def _get_json_for_random_dates(count, use_concept_tags, thumbs):
     :return:
     """
     if count > 100 or count <= 0:
-        raise ValueError('Count must be positive and cannot exceed 100')
-    begin_ordinal = datetime(1995, 6, 16).toordinal()
-    today_ordinal = datetime.today().toordinal()
+        raise ValueError('Count must be positive and cannot exceed 100') # bounds for count
+    begin_ordinal = datetime(1995, 6, 16).toordinal() # start day
+    today_ordinal = datetime.today().toordinal() # todays date
 
-    random_date_ordinals = list(range(begin_ordinal, today_ordinal + 1))
-    shuffle(random_date_ordinals)
+    random_date_ordinals = list(range(begin_ordinal, today_ordinal + 1)) # list of dates
+    
 
     all_data = []
     for date_ordinal in random_date_ordinals:
@@ -188,7 +188,7 @@ def _get_json_for_random_dates(count, use_concept_tags, thumbs):
             continue
 
         data['service_version'] = SERVICE_VERSION
-        all_data.append(data)
+        all_data.append(data) # appending data
         if len(all_data) >= count:
             break
 
@@ -205,8 +205,8 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
     :return:
     """
     # validate input date
-    start_dt = datetime.strptime(start_date, '%Y-%m-%d').date()
-    _validate_date(start_dt)
+    start_dt = datetime.strptime(start_date, '%Y-%m-%d').date() # getting date
+    _validate_date(start_dt) # checking if date is applicable
 
     # get the date param
     if not end_date:
@@ -214,14 +214,14 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
         end_date = datetime.strftime(datetime.today(), '%Y-%m-%d')
 
     # validate input date
-    end_dt = datetime.strptime(end_date, '%Y-%m-%d').date()
-    _validate_date(end_dt)
+    end_dt = datetime.strptime(end_date, '%Y-%m-%d').date() # getting end date
+    _validate_date(end_dt) # checking if date is applicable
 
-    start_ordinal = start_dt.toordinal()
-    end_ordinal = end_dt.toordinal()
-    today_ordinal = datetime.today().date().toordinal()
+    start_ordinal = start_dt.toordinal() # start
+    end_ordinal = end_dt.toordinal() # end
+    today_ordinal = datetime.today().date().toordinal() # today
 
-    if start_ordinal > end_ordinal:
+    if start_ordinal > end_ordinal: # checking validity of start & end dates
         raise ValueError('start_date cannot be after end_date')
 
     all_data = []
@@ -230,7 +230,7 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
         # get data
         dt = date.fromordinal(start_ordinal)
         
-        data = _apod_handler(dt, use_concept_tags, start_ordinal == today_ordinal, thumbs)
+        data = _apod_handler(dt, use_concept_tags, start_ordinal == today_ordinal, thumbs) # getting data from apod 
 
         # Handle case where no data is available
         if not data:
@@ -255,7 +255,7 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
 
 @application.route('/')
 def home():
-    return render_template('home.html', version=SERVICE_VERSION,
+    return render_template('home.html', version=SERVICE_VERSION, # establishing home template
                            service_url=request.host,
                            methodname=APOD_METHOD_NAME,
                            usage=_usage(joinstr='", "', prestr='"') + '"')
@@ -276,25 +276,25 @@ def apod():
         if not _validate(args):
             return _abort(400, 'Bad Request: incorrect field passed.')
 
-        #
-        input_date = args.get('date')
-        count = args.get('count')
-        start_date = args.get('start_date')
-        end_date = args.get('end_date')
-        use_concept_tags = args.get('concept_tags', False)
-        thumbs = args.get('thumbs', False)
+        # getting tags
+        input_date = args.get('date') # getting date
+        count = args.get('count') # getting count
+        start_date = args.get('start_date') # getting start date
+        end_date = args.get('end_date') # getting end date
+        use_concept_tags = args.get('concept_tags', False) # getting concept tags
+        thumbs = args.get('thumbs', False) # getting thumbs
 
         if not count and not start_date and not end_date:
-            return _get_json_for_date(input_date, use_concept_tags, thumbs)
+            return _get_json_for_date(input_date, use_concept_tags, thumbs) # get regular date return
 
         elif not input_date and not start_date and not end_date and count:
-            return _get_json_for_random_dates(int(count), use_concept_tags, thumbs)
+            return _get_json_for_random_dates(int(count), use_concept_tags, thumbs) # get date return with count
 
         elif not count and not input_date and start_date:
-            return _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs)
+            return _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs) # get date return from start date
 
         else:
-            return _abort(400, 'Bad Request: invalid field combination passed.')
+            return _abort(400, 'Bad Request: invalid field combination passed.') # return for invalid field error
 
     except ValueError as ve:
         return _abort(400, str(ve), False)
@@ -302,11 +302,11 @@ def apod():
     except Exception as ex:
 
         etype = type(ex)
-        if etype == ValueError or 'BadRequest' in str(etype):
+        if etype == ValueError or 'BadRequest' in str(etype): # return for value/ bad request error
             return _abort(400, str(ex) + ".")
         else:
             LOG.error('Service Exception. Msg: ' + str(type(ex)))
-            return _abort(500, 'Internal Service Error', usage=False)
+            return _abort(500, 'Internal Service Error', usage=False) # return for service error
 
 
 @application.errorhandler(404)
@@ -314,7 +314,7 @@ def page_not_found(e):
     """
     Return a custom 404 error.
     """
-    LOG.info('Invalid page request: ' + str(e))
+    LOG.info('Invalid page request: ' + str(e)) # return for invalid url
     return _abort(404, 'Sorry, Nothing at this URL.', usage=True)
 
 
@@ -323,8 +323,8 @@ def application_error(e):
     """
     Return a custom 500 error.
     """
-    return _abort(500, 'Sorry, unexpected error: {}'.format(e), usage=False)
+    return _abort(500, 'Sorry, unexpected error: {}'.format(e), usage=False) # returning error
 
 
 if __name__ == '__main__':
-    application.run('0.0.0.0', port=5000)
+    application.run('0.0.0.0', port=5000) # starting up server
