@@ -65,11 +65,11 @@ cd apod-api
 ```
 3. Create a new virtual environment `env` in the directory
 ```bash
-python -m virtualenv env
+python -m venv venv
 ```
 4. Activate the new environment
 ```bash
-source env/bin/activate
+.\venv\Scripts\Activate
 ```
 5. Install dependencies in new environment
 ```bash
