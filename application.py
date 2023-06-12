@@ -28,7 +28,7 @@ import logging
 #from wsgiref.simple_server import make_server
 
 application = Flask(__name__)
-CORS(application)
+CORS(application, resources={r"/*": {"expose_headers": ["X-RateLimit-Limit","X-RateLimit-Remaining"]} })
 
 LOG = logging.getLogger(__name__)
 # logging.basicConfig(level=logging.INFO)
@@ -40,7 +40,7 @@ SERVICE_VERSION = 'v1'
 APOD_METHOD_NAME = 'apod'
 ALLOWED_APOD_FIELDS = ['concept_tags', 'date', 'hd', 'count', 'start_date', 'end_date', 'thumbs']
 ALCHEMY_API_KEY = None
-
+RESULTS_DICT = dict([])
 try:
     with open('alchemy_api.key', 'r') as f:
         ALCHEMY_API_KEY = f.read()
@@ -128,20 +128,35 @@ def _get_json_for_date(input_date, use_concept_tags, thumbs):
         # fall back to using today's date IF they didn't specify a date
         use_default_today_date = True
         dt = input_date  # None
+        key = datetime.utcnow().date()
+        key = str(key.year)+'y'+str(key.month)+'m'+str(key.day)+'d'+str(use_concept_tags)+str(thumbs)
 
     # validate input date
     else:
+
         dt = datetime.strptime(input_date, '%Y-%m-%d').date()
         _validate_date(dt)
+        key = str(dt.year)+'y'+str(dt.month)+'m'+str(dt.day)+'d'+str(use_concept_tags)+str(thumbs)
 
     # get data
-    data = _apod_handler(dt, use_concept_tags, use_default_today_date, thumbs)
+    if key in RESULTS_DICT.keys():
+        data = RESULTS_DICT[key]
+    else:
+        data = _apod_handler(dt, use_concept_tags, use_default_today_date, thumbs)
+        
 
     # Handle case where no data is available
     if not data:
         return _abort(code=404, msg=f"No data available for date: {input_date}", usage=False)
+    
 
     data['service_version'] = SERVICE_VERSION
+
+    #Volatile caching dict
+    datadate =  datetime.strptime(data['date'], '%Y-%m-%d').date()
+    key = str(datadate.year)+'y'+str(datadate.month)+'m'+str(datadate.day)+'d'+str(use_concept_tags)+str(thumbs)
+    RESULTS_DICT[key] = data
+
 
     # return info as JSON
     return jsonify(data)

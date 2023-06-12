@@ -3,7 +3,6 @@
 A microservice written in Python with the [Flask micro framework](http://flask.pocoo.org).
 
 ## NOTES: 
-
 ### Code re-organization has occurred [2020-05-04]!
 Code was reorganized to make it work more easily on AWS's Elastic Beanstalk service.
 
@@ -20,6 +19,7 @@ A very large number of people use the instance of this API that NASA has set up.
 #### Content Related Issues
 No one watching this repository has anything to do with Astronomy Photo of the Day website, so we're unable to deal with issues directly related to their content. Please contact them directly.
 
+
 # Table of contents
 1. [Getting Started](#getting_started)
     1. [Standard environment](#standard_env)
@@ -27,8 +27,9 @@ No one watching this repository has anything to do with Astronomy Photo of the D
     3. [`conda` environment](#conda)
 2. [Docs](#docs)
 3. [APOD parser](#TheAPODParser)
-4. [Feedback](#feedback)
-5. [Author](#author)
+4. [Deployed](#Deployed)
+5. [Feedback](#feedback)
+6. [Author](#author)
 
 &nbsp;
 ## Getting started <a name="getting_started"></a>
@@ -133,15 +134,16 @@ docker run -p 5000:5000 apod-api
 There is only one endpoint in this service which takes 2 optional fields
 as parameters to a http GET request. A JSON dictionary is returned nominally.
 
-**Fields**
+#### URL Search Params | query string parameters
 
+- `api_key` | demo: `DEMO_KEY` | https://api.nasa.gov/#signUp
 - `date` A string in YYYY-MM-DD format indicating the date of the APOD image (example: 2014-11-03).  Defaults to today's date.  Must be after 1995-06-16, the first day an APOD picture was posted.  There are no images for tomorrow available through this API.
-- `concept_tags` A boolean indicating whether concept tags should be returned with the rest of the response.  The concept tags are not necessarily included in the explanation, but rather derived from common search tags that are associated with the description text.  (Better than just pure text search.)  Defaults to False.
-- `hd` A boolean parameter indicating whether or not high-resolution images should be returned. This is present for legacy purposes, it is always ignored by the service and high-resolution urls are returned regardless.
+- `concept_tags` A boolean `True|False` indicating whether concept tags should be returned with the rest of the response.  The concept tags are not necessarily included in the explanation, but rather derived from common search tags that are associated with the description text.  (Better than just pure text search.)  Defaults to False.
+- `hd` A boolean `True|False` parameter indicating whether or not high-resolution images should be returned. This is present for legacy purposes, it is always ignored by the service and high-resolution urls are returned regardless.
 - `count` A positive integer, no greater than 100. If this is specified then `count` randomly chosen images will be returned in a JSON array. Cannot be used in conjunction with `date` or `start_date` and `end_date`.
 - `start_date` A string in YYYY-MM-DD format indicating the start of a date range. All images in the range from `start_date` to `end_date` will be returned in a JSON array. Cannot be used with `date`.
 - `end_date` A string in YYYY-MM-DD format indicating that end of a date range. If `start_date` is specified without an `end_date` then `end_date` defaults to the current date.
-- `thumbs` If set to `true`, the API returns URL of video thumbnail. If an APOD is not a video, this parameter is ignored.
+- `thumbs` A boolean parameter `True|False` inidcating whether the API should return a thumbnail image URL for video files. If set to `True`, the API returns URL of video thumbnail. If an APOD is not a video, this parameter is ignored.
 
 **Returned fields**
 
@@ -161,7 +163,7 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 **Example**
 
 ```bash
-localhost:5000/v1/apod?date=2014-10-01&concept_tags=True
+localhost:5000/v1/apod?api_key=DEMO_KEY&date=2014-10-01&concept_tags=True
 ```
 <details><summary>See Return Object</summary>
 <p>
@@ -312,6 +314,9 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_d
 </p>
 </details>
 
+#### Copyright
+If you are re-displaying imagery, you may want to check for the presence of the copyright. Anything without a copyright returned field is generally NASA and in the public domain. Please see the <a href=https://apod.nasa.gov/apod/lib/about_apod.html>"About image permissions"</a> section on the main Astronomy Photo of the Day site for more information.
+
 ## The APOD Parser<a name="TheAPODParser"></a>
 
 <i>The APOD Parser is not part of the API itself. </i> Rather is intended to be used for accessing the APOD API quickly with Python without writing much additional code yourself. It is found in the apod_parser folder.
@@ -344,6 +349,11 @@ response = apod_object_parser.get_data(<your_api_key>)
 
 **for full docs and more functions visit the readme of  the apod parser by clicking <a href="apod_parser/apod_parser_readme.md">here</a>**
 
+## Deployed <a name="Deployed"></a>
+The deployed version of this API is based on the `eb` branch. The version that was deployed before that is in the `eb_previous` branch. The `master` branch is used as development as that's where most of the pull requests will come into anyways.
+
+This API is deployed on AWS using elastic beanstalk due to large number of people who use the service. However, if you're planning on using it just yourself, it is small enough to be stood up on a single micro EC2 or any other small size cloud compute machine.
+
 ## Feedback <a name="feedback"></a>
 
 Star this repo if you found it useful. Use the github issue tracker to give
@@ -355,5 +365,10 @@ feedback on this repo.
 - Please checkout the <a href="https://github.com/nasa/apod-api/graphs/contributors">contributers</a> to this repository on the righthand side of this page. 
 
 ## Contributing
-We do accept pull requests from the public. Please note that we can be slow to respond. Please be patient. Also, the people with rights on this repository are not people who can debug problems with the APOD website itself. If you would like to contribute, right now we could use some attention to the tests. 
+We do accept pull requests from the public. Please note that we can be slow to respond. Please be patient. 
 
+Also, **the people with rights on this repository are not people who can debug problems with the APOD website itself**. If you would like to contribute, right now we could use some attention to the tests. 
+
+## Links
+
+- [YouTube Embedded Players and Player Parameters](https://developers.google.com/youtube/player_parameters)
