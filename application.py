@@ -27,8 +27,8 @@ import logging
 #### added by justin for EB
 #from wsgiref.simple_server import make_server
 
-application = Flask(__name__)
-CORS(application, resources={r"/*": {"expose_headers": ["X-RateLimit-Limit","X-RateLimit-Remaining"]} })
+app = Flask(__name__)
+CORS(app, resources={r"/*": {"expose_headers": ["X-RateLimit-Limit","X-RateLimit-Remaining"]} })
 
 LOG = logging.getLogger(__name__)
 # logging.basicConfig(level=logging.INFO)
@@ -253,24 +253,24 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
 # Endpoints
 #
 
-@application.route('/')
+@app.route('/')
 def home():
     return render_template('home.html', version=SERVICE_VERSION,
                            service_url=request.host,
                            methodname=APOD_METHOD_NAME,
                            usage=_usage(joinstr='", "', prestr='"') + '"')
 
-@application.route('/static/<asset_path>')
+@app.route('/static/<asset_path>')
 def serve_static(asset_path):
     return current_app.send_static_file(asset_path)
 
 
-@application.route('/' + SERVICE_VERSION + '/' + APOD_METHOD_NAME + '/', methods=['GET'])
+@app.route('/' + SERVICE_VERSION + '/' + APOD_METHOD_NAME + '/', methods=['GET'])
 def apod():
     LOG.info('apod path called')
     try:
 
-        # application/json GET method
+        # app/json GET method
         args = request.args
 
         if not _validate(args):
@@ -309,7 +309,7 @@ def apod():
             return _abort(500, 'Internal Service Error', usage=False)
 
 
-@application.errorhandler(404)
+@app.errorhandler(404)
 def page_not_found(e):
     """
     Return a custom 404 error.
@@ -318,8 +318,8 @@ def page_not_found(e):
     return _abort(404, 'Sorry, Nothing at this URL.', usage=True)
 
 
-@application.errorhandler(500)
-def application_error(e):
+@app.errorhandler(500)
+def app_error(e):
     """
     Return a custom 500 error.
     """
@@ -327,4 +327,4 @@ def application_error(e):
 
 
 if __name__ == '__main__':
-    application.run('0.0.0.0', port=5000)
+    app.run('0.0.0.0', port=8000)

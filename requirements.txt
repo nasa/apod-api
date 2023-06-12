@@ -6,7 +6,6 @@
 # Note: The `lib` directory is added to `sys.path` by `appengine_config.py`.
 flask>=1.0.2
 flask-cors>=3.0.7
-gunicorn==19.5.0
 Jinja2>=2.8
 Werkzeug>=0.10.4
 beautifulsoup4==4.11.1
@@ -17,3 +16,4 @@ setupext-janitor==1.0.0
 bs4==0.0.1
 mock>=3.0.0
 Pillow>=9.3
+waitress==2.1.2
