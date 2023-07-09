@@ -12,5 +12,5 @@ logging.basicConfig(level=logging.DEBUG)
 class TestPageNotFound(unittest.TestCase):
     def test(self, mock_abort):
         GIVEN = Exception('example exception')
-        applicaiton.page_not_found(GIVEN)
+        application.page_not_found(GIVEN)
         mock_abort.assert_called_once()
