@@ -113,7 +113,9 @@ def _get_apod_chars(dt, thumbs):
         props['date'] = _date(soup)
 
     if hd_data:
-        props['hdurl'] = _get_last_url(hd_data)
+        hdurl = _get_last_url(hd_data)
+        if requests.get(hdurl).status_code != 404:
+            props['hdurl'] = hdurl
 
     if thumbs and media_type == "video":
         if thumbs.lower() == "true":
