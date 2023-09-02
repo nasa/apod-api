@@ -162,20 +162,40 @@ def _get_json_for_date(input_date, use_concept_tags, thumbs):
     return jsonify(data)
 
 
-def _get_json_for_random_dates(count, use_concept_tags, thumbs):
+def _get_json_for_random_dates(count, use_concept_tags, thumbs, start_date=None, end_date=None):
     """
     This returns the JSON data for a set of randomly chosen dates. The number of dates is specified by the count
-    parameter
-    :param count:
-    :param use_concept_tags:
-    :return:
+    parameter. Optionally date range can be specified by providing start_date and/or end_date.
+    :param count: Number of Json objects to return (between 1 and 100)
+    :param use_concept_tags: bool.
+    :param thumbs: bool.
+    :param start_date: optional. If not provided - default value "datetime(1995, 6, 16)" will be used
+    :param end_date: optional. If not provided - default value "datetime.today()" will be used
+    :return: list of json objects
     """
-    if count > 100 or count <= 0:
+    if count >= 100 or count < 0:
         raise ValueError('Count must be positive and cannot exceed 100')
-    begin_ordinal = datetime(1995, 6, 16).toordinal()
-    today_ordinal = datetime.today().toordinal()
 
-    random_date_ordinals = list(range(begin_ordinal, today_ordinal + 1))
+    start_dt = datetime.strptime(start_date, '%Y-%m-%d').date() if start_date else datetime(1995, 6, 16).date()
+    end_dt = datetime.strptime(end_date, '%Y-%m-%d').date() if end_date else datetime.today().date()
+    _validate_date(start_dt)
+    _validate_date(end_dt)
+
+    start_ordinal = start_dt.toordinal()
+    end_ordinal = end_dt.toordinal()
+    today_ordinal = datetime.today().date().toordinal()
+
+    delta = (end_ordinal - start_ordinal) + 1
+    # check if start date comes after end date
+    if delta <= 0:
+        raise ValueError('start_date cannot be after end_date')
+
+    # check if there enough dates in the date range to return requested count of the pictures
+    if count > delta:
+        raise ValueError('The requested count number exceeds the number of days in the requested range.'
+                         ' (reduce count number or extend the date range)')
+
+    random_date_ordinals = list(range(start_ordinal, end_ordinal + 1))
     shuffle(random_date_ordinals)
 
     all_data = []
@@ -289,6 +309,9 @@ def apod():
 
         elif not input_date and not start_date and not end_date and count:
             return _get_json_for_random_dates(int(count), use_concept_tags, thumbs)
+
+        elif not input_date and (start_date or end_date) and count:
+            return _get_json_for_random_dates(int(count), use_concept_tags, thumbs, start_date, end_date)
 
         elif not count and not input_date and start_date:
             return _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs)
