@@ -9,6 +9,11 @@ def get_data(api_key):
     return response
 
 
+def get_copyright(response):
+    copyright = response['copyright']
+    return copyright
+
+
 def get_date(response):
     date = response['date']
     return date
