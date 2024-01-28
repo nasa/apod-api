@@ -41,13 +41,13 @@ date = apod_object_parser.get_title(response)
 the `get_url` function takes the dictionary we got above and returns the Standard definition url of the image.
 
 ```python
-date = apod_object_parser.get_hdurl(response)
+date = apod_object_parser.get_url(response)
 ```
 ### get_media_type
 the `get_media_type` function takes the dictionary we got above and returns the media type the file (might be a video of a image).
 
 ```python
-date = apod_object_parser.get_hdurl(response)
+date = apod_object_parser.get_media_type(response)
 ```
 
 ## Other functions
