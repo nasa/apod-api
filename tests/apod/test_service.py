@@ -2,7 +2,6 @@
 # coding= utf-8
 import unittest
 from mock import patch
-from apod import application
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
