@@ -357,8 +357,10 @@ def get_concepts(request, text, apikey):
 
     try:
         LOG.debug("Getting response")
-        response = json.loads(request.get(cbase, fields=params))
-        clist = [concept["text"] for concept in response["concepts"]]
+        response = requests.get(cbase, params=params)
+        response.raise_for_status()
+        data = response.json()
+        clist = [concept["text"] for concept in data["concepts"]]
         return {k: v for k, v in zip(range(len(clist)), clist)}
 
     except Exception as ex:
