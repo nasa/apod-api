@@ -1,4 +1,5 @@
 # Astronomy Picture of the Day (APOD) microservice
+[![DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/nasa/apod-api)
 
 A microservice written in Python with the [Flask micro framework](http://flask.pocoo.org).
 
