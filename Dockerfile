@@ -1,6 +1,6 @@
 # --- STAGE 1: Builder ---
 # We use a specific SHA to ensure the build is deterministic and reproducible.
-FROM python:3.12.10-alpine3.22@sha256:4bbf5ef9ce4b273299d394de268ad6018e10a9375d7efc7c2ce9501a6eb6b86c AS builder
+FROM python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db AS builder
 
 # Install uv (extremely fast Python package manager) by copying the binary from the official image
 COPY --from=ghcr.io/astral-sh/uv:0.9.26 /uv /bin/uv
@@ -37,12 +37,13 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 # --- STAGE 2: Runtime ---
 # We use the exact same base image to ensure binary compatibility with Alpine's musl C library.
-FROM python:3.12.10-alpine3.22@sha256:4bbf5ef9ce4b273299d394de268ad6018e10a9375d7efc7c2ce9501a6eb6b86c
+FROM python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
 
 # Security: Create a non-privileged user to run the application.
 # Alpine uses 'addgroup' and 'adduser' syntax.
-RUN addgroup -S -g 1000 nonroot && \
-    adduser -S -u 1000 -G nonroot nonroot
+# Setup a non-root user
+RUN groupadd --system --gid 1000 nonroot \
+ && useradd --system --gid 1000 --uid 1000 --create-home nonroot
 
 # Copy only the necessary files from the builder (app + .venv).
 # This keeps the final image size small (~81MB vs ~351MB).
