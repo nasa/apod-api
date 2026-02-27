@@ -42,7 +42,7 @@ FROM python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a42
 # Security: Create a non-privileged user to run the application.
 # Setup a non-root user
 RUN groupadd --system --gid 1000 nonroot \
- && useradd --system --gid 1000 --uid --create-home nonroot
+ && useradd --system --gid 1000 --uid 1000 --create-home nonroot
 
 # Copy only the necessary files from the builder (app + .venv)
 # This keeps the final image size small
