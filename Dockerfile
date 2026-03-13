@@ -2,7 +2,7 @@
 # We use a specific SHA to ensure the build is deterministic and reproducible.
 FROM python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db AS builder
 
-# Install uv (extremely fast Python package manager) by copying the binary from the official image
+# Install uv directly from its official image
 COPY --from=ghcr.io/astral-sh/uv:0.9.26 /uv /bin/uv
 
 # UV Configuration:
