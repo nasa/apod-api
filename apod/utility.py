@@ -284,7 +284,7 @@ def _date(soup):
                          ].index(month.lower()) + 1
                 day = int(day)
                 return datetime.date(year=year, month=month, day=day).strftime('%Y-%m-%d')
-            except:
+            except Exception:
                 LOG.debug('unable to retrieve date from line: ' + line)
     raise Exception('Date not found in soup data.')
 
