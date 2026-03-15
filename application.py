@@ -14,7 +14,6 @@ adapted for AWS Elastic Beanstalk deployment
 """
 import sys
 sys.path.insert(0, "../lib")
-### justin edit
 sys.path.insert(1, ".")
 
 from datetime import datetime, date
@@ -22,6 +21,7 @@ from random import shuffle
 from flask import request, jsonify, render_template, Flask, current_app
 from flask_cors import CORS
 from apod.utility import parse_apod, get_concepts
+from waitress import serve
 import logging
 
 #### added by justin for EB
@@ -31,8 +31,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"expose_headers": ["X-RateLimit-Limit","X-RateLimit-Remaining"]} })
 
 LOG = logging.getLogger(__name__)
-# logging.basicConfig(level=logging.INFO)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 # this should reflect both this service and the backing
 # assorted libraries
@@ -327,4 +326,4 @@ def app_error(e):
 
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', port=8000)
+    serve(app, host='0.0.0.0', port=8000)
