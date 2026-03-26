@@ -349,7 +349,6 @@ def serve_static(asset_path):
 
 @app.route("/" + SERVICE_VERSION + "/" + APOD_METHOD_NAME + "/", methods=["GET"])
 def apod():
-    LOG.info("apod path called")
     try:
         # app/json GET method
         args = request.args

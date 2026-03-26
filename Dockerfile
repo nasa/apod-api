@@ -26,4 +26,4 @@ EXPOSE 5000
 # Run the production server
 # -w 4: Run 4 worker processes
 # -b 0.0.0.0:5000: Listen on all interfaces on port 5000
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "application:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "--access-logfile", "-", "application:app"]
