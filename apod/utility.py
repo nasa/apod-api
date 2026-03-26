@@ -159,6 +159,8 @@ def _title(soup):
             title = bold_selection.text.strip()
             try:
                 title = title.encode("latin1").decode("cp1252")
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                pass # text is already proper Unicode, leave it as-is
             except Exception as ex:
                 LOG.error(str(ex))
         else:
@@ -167,6 +169,8 @@ def _title(soup):
             title = bold_selection.text.strip()
             try:
                 title = title.encode("latin1").decode("cp1252")
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                pass # text is already proper Unicode, leave it as-is
             except Exception as ex:
                 LOG.error(str(ex))
 
@@ -177,6 +181,8 @@ def _title(soup):
         title = text.strip()
         try:
             title = title.encode("latin1").decode("cp1252")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            pass # text is already proper Unicode, leave it as-is
         except Exception as ex:
             LOG.error(str(ex))
 
@@ -229,6 +235,8 @@ def _copyright(soup):
         if copyright_text:
             try:
                 copyright_text = copyright_text.encode("latin1").decode("cp1252")
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                pass # text is already proper Unicode, leave it as-is
             except Exception as ex:
                 LOG.error(str(ex))
 
@@ -271,6 +279,8 @@ def _explanation(soup):
 
     try:
         s = s.encode("latin1").decode("cp1252")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        pass # text is already proper Unicode, leave it as-is
     except Exception as ex:
         LOG.error(str(ex))
 
