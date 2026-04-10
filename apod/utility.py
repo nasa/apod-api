@@ -6,6 +6,7 @@ Created on Mar 24, 2017
 @author=bathomas @email=brian.a.thomas@nasa.gov
 """
 
+import codecs
 import datetime
 import json
 import logging
@@ -26,6 +27,25 @@ BASE = "https://apod.nasa.gov/apod/"
 # Create urllib3 Pool Manager
 http = urllib3.PoolManager()
 
+# function for decoding response text into utf-8 or utf-16
+def _decode_response_text(res):
+    """
+    Decode APOD response bytes defensively because APOD occasionally serves
+    UTF-16 content while declaring UTF-8 in headers.
+    """
+    content = res.content or b""
+
+    if content.startswith(codecs.BOM_UTF16_LE) or content.startswith(codecs.BOM_UTF16_BE):
+        return content.decode("utf-16", errors="replace")
+
+    apparent = (res.apparent_encoding or "").lower()
+    if apparent.startswith("utf-16"):
+        return content.decode("utf-16", errors="replace")
+
+    if res.text:
+        return res.text
+
+    return content.decode("utf-8", errors="replace")
 
 # function for getting video thumbnails
 def _get_thumbs(data):
@@ -75,7 +95,7 @@ def _get_apod_chars(dt, thumbs):
         apod_url = "%sastropix.html" % BASE
     LOG.debug("OPENING URL:" + apod_url)
     res = requests.get(apod_url)
-
+    page_text = _decode_response_text(res)
     if res.status_code == 404:
         return None
         # LOG.error(f'No APOD entry for URL: {apod_url}')
@@ -88,7 +108,7 @@ def _get_apod_chars(dt, thumbs):
 
         # return default_obj_props
 
-    soup = BeautifulSoup(res.text, "html.parser")
+    soup = BeautifulSoup(page_text, "html.parser")
     LOG.debug("getting the data url")
     hd_data = None
     if soup.img:
