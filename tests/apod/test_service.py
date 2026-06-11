@@ -1,4 +1,3 @@
-#!/bin/sh/python
 # coding= utf-8
 import logging
 import unittest

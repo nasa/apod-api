@@ -1,4 +1,3 @@
-#!/bin/sh/python
 # coding= utf-8
 import unittest
 from datetime import datetime
