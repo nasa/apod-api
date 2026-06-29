@@ -12,7 +12,7 @@ dependencies = [
     "jinja2>=3.1.6",
     "pillow>=12.2.0",
     "requests>=2.33.0",
-    "urllib3>=2.6.3",
+    "urllib3>=2.7.0",
     "werkzeug>=3.1.5",
 ]
 
