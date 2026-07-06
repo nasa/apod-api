@@ -16,6 +16,9 @@ import requests
 import urllib3
 from bs4 import BeautifulSoup
 
+from functools import wraps
+
+
 # import urllib.request
 
 LOG = logging.getLogger(__name__)
@@ -49,7 +52,7 @@ def _decode_response_text(res):
 
 # function for getting video thumbnails
 def _get_thumbs(data):
-    global video_thumb
+    video_thumb = ""
     if "youtube" in data or "youtu.be" in data:
         # get ID from YouTube URL
         youtube_id_regex = re.compile(
@@ -73,9 +76,6 @@ def _get_thumbs(data):
         )
         data = json.loads(vimeo_request.data.decode("utf-8"))
         video_thumb = data[0]["thumbnail_large"]
-    else:
-        # the thumbs parameter is True, but the APOD for the date is not a video, output nothing
-        video_thumb = ""
 
     return video_thumb
 
@@ -90,7 +90,7 @@ def _get_apod_chars(dt, thumbs):
     media_type = "image"
     if dt:
         date_str = dt.strftime("%y%m%d")
-        apod_url = "%sap%s.html" % (BASE, date_str)
+        apod_url = f"{BASE}ap{date_str}.html"
     else:
         apod_url = "%sastropix.html" % BASE
     LOG.debug("OPENING URL:" + apod_url)
@@ -162,7 +162,24 @@ def _get_apod_chars(dt, thumbs):
 
     return props
 
+def fix_encoding(func):
+    """Decorator to fix encoding issues in string return values."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
 
+        if isinstance(result, str):
+            try:
+                return result.encode("latin1").decode("cp1252")
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                return result
+            except Exception as ex:
+                LOG.error(f"Error fixing encoding in {func.__name__}: {ex}")
+                return result
+        return result
+    return wrapper
+
+@fix_encoding
 def _title(soup):
     """
     Accepts a BeautifulSoup object for the APOD HTML page and returns the
@@ -177,38 +194,20 @@ def _title(soup):
             center_selection = soup.find_all("center")[0]
             bold_selection = center_selection.find_all("b")[0]
             title = bold_selection.text.strip()
-            try:
-                title = title.encode("latin1").decode("cp1252")
-            except (UnicodeEncodeError, UnicodeDecodeError):
-                pass # text is already proper Unicode, leave it as-is
-            except Exception as ex:
-                LOG.error(str(ex))
         else:
             center_selection = soup.find_all("center")[1]
             bold_selection = center_selection.find_all("b")[0]
             title = bold_selection.text.strip()
-            try:
-                title = title.encode("latin1").decode("cp1252")
-            except (UnicodeEncodeError, UnicodeDecodeError):
-                pass # text is already proper Unicode, leave it as-is
-            except Exception as ex:
-                LOG.error(str(ex))
 
         return title
     except Exception:
         # Handler for early APOD entries
         text = soup.title.text.split(" - ")[-1]
         title = text.strip()
-        try:
-            title = title.encode("latin1").decode("cp1252")
-        except (UnicodeEncodeError, UnicodeDecodeError):
-            pass # text is already proper Unicode, leave it as-is
-        except Exception as ex:
-            LOG.error(str(ex))
 
         return title
 
-
+@fix_encoding
 def _copyright(soup):
     """
     Accepts a BeautifulSoup object for the APOD HTML page and returns the
@@ -251,22 +250,13 @@ def _copyright(soup):
 
                     if stuff:
                         copyright_text = stuff.strip()
-
-        if copyright_text:
-            try:
-                copyright_text = copyright_text.encode("latin1").decode("cp1252")
-            except (UnicodeEncodeError, UnicodeDecodeError):
-                pass # text is already proper Unicode, leave it as-is
-            except Exception as ex:
-                LOG.error(str(ex))
-
         return copyright_text
 
     except Exception as ex:
         LOG.error(str(ex))
         raise ValueError("Unsupported schema for given date.")
 
-
+@fix_encoding
 def _explanation(soup):
     """
     Accepts a BeautifulSoup object for the APOD HTML page and returns the
@@ -296,13 +286,6 @@ def _explanation(soup):
 
         idx = texts[begin_idx:].index("")
         s = " ".join(texts[begin_idx : begin_idx + idx])
-
-    try:
-        s = s.encode("latin1").decode("cp1252")
-    except (UnicodeEncodeError, UnicodeDecodeError):
-        pass # text is already proper Unicode, leave it as-is
-    except Exception as ex:
-        LOG.error(str(ex))
 
     return s
 
