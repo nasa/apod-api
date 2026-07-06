@@ -13,8 +13,9 @@ import logging
 import re
 
 import requests
-import urllib3
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # import urllib.request
 
@@ -24,8 +25,38 @@ logging.basicConfig(level=logging.WARN)
 # location of backing APOD service
 BASE = "https://apod.nasa.gov/apod/"
 
-# Create urllib3 Pool Manager
-http = urllib3.PoolManager()
+# apod.nasa.gov intermittently hangs or returns 5xx errors; without a timeout
+# a stuck upstream connection holds a worker indefinitely, and without retries
+# a single transient failure becomes a hard error for the client.
+# Hung connections are bounded so the request cycle fits within gunicorn's
+# default 30s worker timeout: connect hangs cost at most ~16s (3 attempts of
+# 5s plus backoff) and read hangs at most ~26s (2 attempts of 13s). Transient
+# 5xx responses normally arrive quickly, so retrying them adds little latency.
+CONNECT_TIMEOUT = 5  # seconds to establish the upstream connection
+READ_TIMEOUT = 8  # seconds to wait for the upstream response
+REQUEST_TIMEOUT = (CONNECT_TIMEOUT, READ_TIMEOUT)
+
+# Shared session so outbound requests reuse pooled connections and retry
+# transient upstream failures with exponential backoff. Retry-After headers
+# are deliberately ignored: honoring a long server-specified delay on a
+# 429/503 would sleep the worker past its timeout. raise_on_status=False
+# hands the final response back so the caller decides how to surface it.
+session = requests.Session()
+session.mount(
+    "https://",
+    HTTPAdapter(
+        max_retries=Retry(
+            total=3,
+            connect=2,
+            read=1,
+            backoff_factor=0.5,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["GET"],
+            raise_on_status=False,
+            respect_retry_after_header=False,
+        )
+    ),
+)
 
 # function for decoding response text into utf-8 or utf-16
 def _decode_response_text(res):
@@ -68,10 +99,12 @@ def _get_thumbs(data):
         vimeo_id_regex = re.compile(r"(?:/video/)(\d+)")
         vimeo_id = vimeo_id_regex.findall(data)[0]
         # make an API call to get thumbnail URL
-        vimeo_request = http.request(
-            "GET", "https://vimeo.com/api/v2/video/" + vimeo_id + ".json"
+        vimeo_request = session.get(
+            "https://vimeo.com/api/v2/video/" + vimeo_id + ".json",
+            timeout=REQUEST_TIMEOUT,
         )
-        data = json.loads(vimeo_request.data.decode("utf-8"))
+        vimeo_request.raise_for_status()
+        data = vimeo_request.json()
         video_thumb = data[0]["thumbnail_large"]
     else:
         # the thumbs parameter is True, but the APOD for the date is not a video, output nothing
@@ -94,8 +127,7 @@ def _get_apod_chars(dt, thumbs):
     else:
         apod_url = "%sastropix.html" % BASE
     LOG.debug("OPENING URL:" + apod_url)
-    res = requests.get(apod_url)
-    page_text = _decode_response_text(res)
+    res = session.get(apod_url, timeout=REQUEST_TIMEOUT)
     if res.status_code == 404:
         return None
         # LOG.error(f'No APOD entry for URL: {apod_url}')
@@ -107,6 +139,11 @@ def _get_apod_chars(dt, thumbs):
         # default_obj_props['date'] = dt.strftime('%Y-%m-%d')
 
         # return default_obj_props
+
+    # surface upstream failures that persist after retries as a clear error
+    # instead of attempting to parse an error page
+    res.raise_for_status()
+    page_text = _decode_response_text(res)
 
     soup = BeautifulSoup(page_text, "html.parser")
     LOG.debug("getting the data url")
