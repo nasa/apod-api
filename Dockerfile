@@ -14,6 +14,11 @@ COPY pyproject.toml uv.lock ./
 # Install dependencies into the system python environment.
 RUN uv sync --frozen --no-dev
 
+# Create a non-root user for security
+RUN useradd -m -u 1000 apod && \
+    chown -R apod:apod /app
+USER apod
+
 # This makes 'gunicorn' and 'flask' available globally in the container
 ENV PATH="/app/.venv/bin:$PATH"
 
