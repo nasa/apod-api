@@ -154,7 +154,7 @@ localhost:5000/v1/apod?date=2014-10-01&concept_tags=True
 
 
 ```bash
-https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5
+https://api.nasa.gov/planetary/apod?count=5&api_key=DEMO_KEY
 ```
 
 <details><summary>See Return Object</summary>
@@ -219,7 +219,7 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5
 
 
 ```bash
-https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_date=2017-07-10
+https://api.nasa.gov/planetary/apod?start_date=2017-07-08&end_date=2017-07-10&api_key=DEMO_KEY
 ```
 
 <details><summary>See Return Object</summary>
