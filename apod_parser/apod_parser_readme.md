@@ -7,7 +7,7 @@ get a Nasa api key by clicking <a href="https://api.nasa.gov/#signUp">here</a>.
 ```python
 import apod_object_parser
 ```
-2. Now call the `get_data` function and pass the `nasa api key` as the argument. Note api_key is a string. The response returned will be a Dictionary. Now you can parse the dictionary too
+2. Now call the `get_data` function and pass your `nasa api key` as the argument. The response returned will be a Dictionary. Now you can parse the dictionary too
 
 ```python 
 response = apod_object_parser.get_data(##Pass In Your API key here)

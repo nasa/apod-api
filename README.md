@@ -85,7 +85,6 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 
 #### URL Search Params | query string parameters
 
-- `api_key` | demo: `DEMO_KEY` | https://api.nasa.gov/#signUp
 - `date` A string in YYYY-MM-DD format indicating the date of the APOD image (example: 2014-11-03).  Defaults to today's date.  Must be after 1995-06-16, the first day an APOD picture was posted.  There are no images for tomorrow available through this API.
 - `concept_tags` A boolean `True|False` indicating whether concept tags should be returned with the rest of the response.  The concept tags are not necessarily included in the explanation, but rather derived from common search tags that are associated with the description text.  (Better than just pure text search.)  Defaults to False.
 - `hd` A boolean `True|False` parameter indicating whether or not high-resolution images should be returned. This is present for legacy purposes, it is always ignored by the service and high-resolution urls are returned regardless.
@@ -112,7 +111,7 @@ as parameters to a http GET request. A JSON dictionary is returned nominally.
 **Example**
 
 ```bash
-localhost:5000/v1/apod?api_key=DEMO_KEY&date=2014-10-01&concept_tags=True
+localhost:5000/v1/apod?date=2014-10-01&concept_tags=True
 ```
 <details><summary>See Return Object</summary>
 <p>
@@ -155,7 +154,7 @@ localhost:5000/v1/apod?api_key=DEMO_KEY&date=2014-10-01&concept_tags=True
 
 
 ```bash
-https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5
+https://api.nasa.gov/planetary/apod?count=5&api_key=DEMO_KEY
 ```
 
 <details><summary>See Return Object</summary>
@@ -220,7 +219,7 @@ https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&count=5
 
 
 ```bash
-https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&start_date=2017-07-08&end_date=2017-07-10
+https://api.nasa.gov/planetary/apod?start_date=2017-07-08&end_date=2017-07-10&api_key=DEMO_KEY
 ```
 
 <details><summary>See Return Object</summary>
