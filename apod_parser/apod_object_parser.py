@@ -6,11 +6,39 @@ from PIL import Image
 
 
 def get_data(api_key):
+    from datetime import date
+
+    use_date = date.today().strftime("%y%m%d")
     raw_response = requests.get(
-        f"https://api.nasa.gov/planetary/apod?api_key={api_key}"
+        f"https://science.nasa.gov/wp-json/wp/v2/apod-basic/?api_key={api_key}"
     ).text
-    response = json.loads(raw_response)
+    response = json.loads(raw_response)[0]
     return response
+
+
+def get_alt(response):
+    alt = response["alt"]
+    return alt
+
+
+def get_basic_html(response):
+    basic_html = response["basic_html"]
+    return basic_html
+
+
+def get_basic_html_url(response):
+    basic_html_url = response["basic_html_url"]
+    return basic_html_url
+
+
+def get_copyright(response):
+    copyright = response["copyright"]
+    return copyright
+
+
+def get_credit(response):
+    credit = response["credit"]
+    return credit
 
 
 def get_date(response):
@@ -18,9 +46,9 @@ def get_date(response):
     return date
 
 
-def get_explaination(response):
-    explaination = response["explanation"]
-    return explaination
+def get_explanation(response):
+    explanation = response["explanation"]
+    return explanation
 
 
 def get_hdurl(response):
@@ -33,14 +61,19 @@ def get_media_type(response):
     return media_type
 
 
-def get_service_version(response):
-    service_version = response["service_version"]
-    return service_version
+def get_permalink(response):
+    permalink = response["permalink"]
+    return permalink
+
+
+def get_post_id(response):
+    post_id = response["post_id"]
+    return post_id
 
 
 def get_title(response):
-    service_version = response["title"]
-    return service_version
+    title = response["title"]
+    return title
 
 
 def get_url(response):
