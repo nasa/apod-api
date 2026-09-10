@@ -32,8 +32,8 @@ def get_media_type(response):
 
 
 def get_title(response):
-    service_version = response["title"]
-    return service_version
+    title = response["title"]
+    return title
 
 
 def get_url(response):

@@ -114,9 +114,11 @@ def _get_json_for_date(input_date):
     data = requests.get(
         f"https://science.nasa.gov/wp-json/wp/v2/apod-basic/{input_date}"
     )
+    json_response = data.json()
+    json_response["service_version"] = SERVICE_VERSION
 
     # return info as JSON
-    return data.json()
+    return json_response
 
 
 def _get_json_for_random_dates(count):
@@ -142,7 +144,10 @@ def _get_json_for_random_dates(count):
         if not data:
             continue
 
-        all_data.append(data.json())
+        json_response = data.json()
+        json_response["service_version"] = SERVICE_VERSION
+
+        all_data.append(json_response)
 
     return jsonify(all_data)
 
@@ -173,12 +178,16 @@ def _get_json_for_date_range(start_date, end_date):
     use_start_date = str(start_date).replace("-", "")[2:]
     use_end_date = str(end_date).replace("-", "")[2:]
 
-    all_data = requests.get(
+    data = requests.get(
         f"https://science.nasa.gov/wp-json/wp/v2/apod-basic?date_from={use_start_date}&date_to={use_end_date}"
     )
+    json_response = data.json()
+
+    for item in json_response:
+        item["service_version"] = SERVICE_VERSION
 
     # return info as JSON
-    return all_data.json()
+    return json_response
 
 
 #
