@@ -49,7 +49,6 @@ ALLOWED_APOD_FIELDS = [
     "start_date",
     "end_date",
     "thumbs",
-    "api_key",
 ]
 ALCHEMY_API_KEY = None
 RESULTS_DICT = dict([])

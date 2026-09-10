@@ -16,39 +16,9 @@ def get_data(api_key):
     return response
 
 
-def get_alt(response):
-    alt = response["alt"]
-    return alt
-
-
-def get_basic_html(response):
-    basic_html = response["basic_html"]
-    return basic_html
-
-
-def get_basic_html_url(response):
-    basic_html_url = response["basic_html_url"]
-    return basic_html_url
-
-
-def get_copyright(response):
-    copyright = response["copyright"]
-    return copyright
-
-
-def get_credit(response):
-    credit = response["credit"]
-    return credit
-
-
-def get_date(response):
-    date = response["date"]
-    return date
-
-
-def get_explanation(response):
-    explanation = response["explanation"]
-    return explanation
+def get_explaination(response):
+    explaination = response["explanation"]
+    return explaination
 
 
 def get_hdurl(response):
@@ -61,19 +31,9 @@ def get_media_type(response):
     return media_type
 
 
-def get_permalink(response):
-    permalink = response["permalink"]
-    return permalink
-
-
-def get_post_id(response):
-    post_id = response["post_id"]
-    return post_id
-
-
 def get_title(response):
-    title = response["title"]
-    return title
+    service_version = response["title"]
+    return service_version
 
 
 def get_url(response):
