@@ -7,7 +7,8 @@ A microservice written in Python with the [Flask micro framework](http://flask.p
 The backend has been rewired to point to the new <a href=" https://science.nasa.gov/wp-json/wp/v2/apod-basic">Wordpress Endpoint</a>
 This API will pass your call to the new endpoint and return the result.
 This readme has been updated with the new return values and their meaning.
-This repo will be archived and the API Umbrella will be pointed to the new end point on December 1, 2026.
+This repo will be archived and will be pointed to the new end point on December 1, 2026.
+Full documentation can be found <a target="_blank" href="https://schlotterer.notion.site/APOD-Feed-And-API-User-Guide-39697d8747c38015a53edfdde76d4f5e">here</a>.
 
 #### Code "refresh" has occured 1-21-2026!
 Code was refreshed to use uv for dependency management. Dockerfile and docker-compose.yml were updated to support containerized deployment. All open issues and PRs will closed to start fresh. Please open new issues or PRs as needed. We are still in the process of updating the hosting of this API so there may be some downtime till we can get the API moved into the new system. An update will be posted here when that is complete.
