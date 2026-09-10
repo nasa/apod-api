@@ -16,14 +16,11 @@ adapted for AWS Elastic Beanstalk deployment
 """
 
 import logging
-from datetime import date, datetime, timezone
-from random import shuffle
+from datetime import date, datetime
 
 import requests
 from flask import Flask, current_app, jsonify, render_template, request
 from flask_cors import CORS
-
-from apod.utility import get_concepts, parse_apod
 
 app = Flask(__name__)
 CORS(
@@ -164,12 +161,12 @@ def _get_json_for_date_range(start_date, end_date):
 
     # validate input date
     start_dt = datetime.strptime(start_date, "%Y-%m-%d")
+
     # get the date param
     if not end_date:
         # fall back to using today's date IF they didn't specify a date
-        end_date = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date = start_date
 
-    # validate input date
     end_dt = datetime.strptime(end_date, "%Y-%m-%d")
 
     if start_dt > end_dt:
