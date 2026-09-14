@@ -16,13 +16,11 @@ adapted for AWS Elastic Beanstalk deployment
 """
 
 import logging
-from datetime import date, datetime, timezone
-from random import shuffle
+from datetime import date, datetime
 
+import requests
 from flask import Flask, current_app, jsonify, render_template, request
 from flask_cors import CORS
-
-from apod.utility import get_concepts, parse_apod
 
 app = Flask(__name__)
 CORS(
@@ -88,69 +86,18 @@ def _validate(data):
     return True
 
 
-def _validate_date(dt):
-    LOG.debug("_validate_date(dt) called")
-    today = datetime.today().date()
-    begin = datetime(1995, 6, 16).date()  # first APOD image date
+def _gen_date_after_date(start_date: datetime) -> datetime:
+    import random
+    from datetime import timedelta
 
-    # validate input
-    if (dt > today) or (dt < begin):
-        today_str = today.strftime("%b %d, %Y")
-        begin_str = begin.strftime("%b %d, %Y")
-
-        raise ValueError("Date must be between %s and %s." % (begin_str, today_str))
+    today = date.today()
+    days_difference = (today - start_date).days
+    random_days = random.randrange(1, days_difference)
+    random_future_date = start_date + timedelta(days=random_days)
+    return random_future_date
 
 
-def _validate_bools(bool_args: list):
-    """
-    Validates a list of boolean arguments
-
-    :param bool_args: a list of arguments to validate as booleans. These can be either boolean types or strings that can be converted to booleans ("true" or "false", case insensitive).
-    :type bool_args: list
-    :return: True if all arguments are valid booleans or boolean strings, False otherwise.
-    """
-    for bool_arg in bool_args:
-        if isinstance(bool_arg, bool):
-            continue
-        elif isinstance(bool_arg, str) and bool_arg.lower() in ["true", "false"]:
-            continue
-        else:
-            return False
-    return True
-
-
-def _apod_handler(
-    dt, use_concept_tags=False, use_default_today_date=False, thumbs=False
-):
-    """
-    Accepts a parameter dictionary. Returns the response object to be
-    served through the API.
-    """
-    try:
-        page_props = parse_apod(dt, use_default_today_date, thumbs)
-        if not page_props:
-            return None
-        LOG.debug("managed to get apod page characteristics")
-
-        if use_concept_tags:
-            if ALCHEMY_API_KEY is None:
-                page_props["concepts"] = (
-                    "concept_tags functionality turned off in current service"
-                )
-            else:
-                page_props["concepts"] = get_concepts(
-                    request, page_props["explanation"], ALCHEMY_API_KEY
-                )
-
-        return page_props
-
-    except Exception as e:
-        LOG.error("Internal Service Error :" + str(type(e)) + " msg:" + str(e))
-        # return code 500 here
-        return _abort(500, "Internal Service Error", usage=False)
-
-
-def _get_json_for_date(input_date, use_concept_tags, thumbs):
+def _get_json_for_date(input_date):
     """
     This returns the JSON data for a specific date, which must be a string of the form YYYY-MM-DD. If date is None,
     then it defaults to the current date.
@@ -161,74 +108,18 @@ def _get_json_for_date(input_date, use_concept_tags, thumbs):
     """
 
     # get the date param
-    use_default_today_date = False
-    if not input_date:
-        # fall back to using today's date IF they didn't specify a date
-        use_default_today_date = True
-        dt = input_date  # None
-        key = datetime.now(timezone.utc).date()
-        key = (
-            str(key.year)
-            + "y"
-            + str(key.month)
-            + "m"
-            + str(key.day)
-            + "d"
-            + str(use_concept_tags)
-            + str(thumbs)
-        )
-
-    # validate input date
-    else:
-        dt = datetime.strptime(input_date, "%Y-%m-%d").date()
-        _validate_date(dt)
-        key = (
-            str(dt.year)
-            + "y"
-            + str(dt.month)
-            + "m"
-            + str(dt.day)
-            + "d"
-            + str(use_concept_tags)
-            + str(thumbs)
-        )
-
-    # get data
-    if key in RESULTS_DICT.keys():
-        data = RESULTS_DICT[key]
-    else:
-        data = _apod_handler(dt, use_concept_tags, use_default_today_date, thumbs)
-
-    # Handle case where no data is available
-    if not data:
-        return _abort(
-            code=404, msg=f"No data available for date: {input_date}", usage=False
-        )
-
-    if not isinstance(data, dict):
-        return data
-
-    data["service_version"] = SERVICE_VERSION
-
-    # Volatile caching dict
-    datadate = datetime.strptime(data["date"], "%Y-%m-%d").date()
-    key = (
-        str(datadate.year)
-        + "y"
-        + str(datadate.month)
-        + "m"
-        + str(datadate.day)
-        + "d"
-        + str(use_concept_tags)
-        + str(thumbs)
+    data = requests.get(
+        f"https://science.nasa.gov/wp-json/wp/v2/apod-basic/{input_date}"
     )
-    RESULTS_DICT[key] = data
+    json_response = data.json()
+    json_response["url"] = json_response["hdurl"]
+    json_response["service_version"] = SERVICE_VERSION
 
     # return info as JSON
-    return jsonify(data)
+    return json_response
 
 
-def _get_json_for_random_dates(count, use_concept_tags, thumbs):
+def _get_json_for_random_dates(count):
     """
     This returns the JSON data for a set of randomly chosen dates. The number of dates is specified by the count
     parameter
@@ -236,37 +127,31 @@ def _get_json_for_random_dates(count, use_concept_tags, thumbs):
     :param use_concept_tags:
     :return:
     """
-    if count > 100 or count <= 0:
-        raise ValueError("Count must be positive and cannot exceed 100")
-    begin_ordinal = datetime(1995, 6, 16).toordinal()
-    today_ordinal = datetime.today().toordinal()
-
-    random_date_ordinals = list(range(begin_ordinal, today_ordinal + 1))
-    shuffle(random_date_ordinals)
+    if count > 25 or count <= 0:
+        raise ValueError("Count must be positive and cannot exceed 25")
 
     all_data = []
-    for date_ordinal in random_date_ordinals:
-        dt = date.fromordinal(date_ordinal)
-        data = _apod_handler(
-            dt, use_concept_tags, date_ordinal == today_ordinal, thumbs
+    for i in range(count):
+        rand_date = _gen_date_after_date(date(1995, 6, 16))
+        format_date = str(rand_date).replace("-", "")[2:]
+        data = requests.get(
+            f"https://science.nasa.gov/wp-json/wp/v2/apod-basic/{format_date}"
         )
 
         # Handle case where no data is available
         if not data:
             continue
 
-        if not isinstance(data, dict):
-            continue
+        json_response = data.json()
+        json_response["url"] = json_response["hdurl"]
+        json_response["service_version"] = SERVICE_VERSION
 
-        data["service_version"] = SERVICE_VERSION
-        all_data.append(data)
-        if len(all_data) >= count:
-            break
+        all_data.append(json_response)
 
     return jsonify(all_data)
 
 
-def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
+def _get_json_for_date_range(start_date, end_date):
     """
     This returns the JSON data for a range of dates, specified by start_date and end_date, which must be strings of the
     form YYYY-MM-DD. If end_date is None then it defaults to the current date.
@@ -275,55 +160,38 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
     :param use_concept_tags:
     :return:
     """
+
     # validate input date
-    start_dt = datetime.strptime(start_date, "%Y-%m-%d").date()
-    _validate_date(start_dt)
+    start_dt = datetime.strptime(start_date, "%Y-%m-%d")
 
     # get the date param
     if not end_date:
-        # fall back to using today's date IF they didn't specify a date
-        end_date = datetime.strftime(datetime.today(), "%Y-%m-%d")
+        from datetime import timedelta
 
-    # validate input date
-    end_dt = datetime.strptime(end_date, "%Y-%m-%d").date()
-    _validate_date(end_dt)
+        # fall back to using day 25 days in the future to give a substantive response
+        initial_day = datetime.strptime(start_date, "%Y-%m-%d")
+        future_date = initial_day + timedelta(days=25)
+        end_date = future_date.strftime("%Y-%m-%d")
 
-    start_ordinal = start_dt.toordinal()
-    end_ordinal = end_dt.toordinal()
-    today_ordinal = datetime.today().date().toordinal()
+    end_dt = datetime.strptime(end_date, "%Y-%m-%d")
 
-    if start_ordinal > end_ordinal:
+    if start_dt > end_dt:
         raise ValueError("start_date cannot be after end_date")
 
-    all_data = []
+    use_start_date = str(start_date).replace("-", "")[2:]
+    use_end_date = str(end_date).replace("-", "")[2:]
 
-    while start_ordinal <= end_ordinal:
-        # get data
-        dt = date.fromordinal(start_ordinal)
+    data = requests.get(
+        f"https://science.nasa.gov/wp-json/wp/v2/apod-basic?date_from={use_start_date}&date_to={use_end_date}"
+    )
+    json_response = data.json()
 
-        data = _apod_handler(
-            dt, use_concept_tags, start_ordinal == today_ordinal, thumbs
-        )
-
-        # Handle case where no data is available
-        if not data:
-            start_ordinal += 1
-            continue
-
-        if not isinstance(data, dict):
-            start_ordinal += 1
-            continue
-
-        data["service_version"] = SERVICE_VERSION
-
-        if data["date"] == dt.isoformat():
-            # Handles edge case where server is a day ahead of NASA APOD service
-            all_data.append(data)
-
-        start_ordinal += 1
+    for item in json_response:
+        item["url"] = item["hdurl"]
+        item["service_version"] = SERVICE_VERSION
 
     # return info as JSON
-    return jsonify(all_data)
+    return json_response
 
 
 #
@@ -352,33 +220,28 @@ def apod():
     try:
         # app/json GET method
         args = request.args
-
         if not _validate(args):
             return _abort(400, "Bad Request: incorrect field passed.")
 
-        #
-        input_date = args.get("date")
-        count = args.get("count")
-        start_date = args.get("start_date")
-        end_date = args.get("end_date")
-        use_concept_tags = args.get("concept_tags", False)
-        thumbs = args.get("thumbs", False)
+        input_date = args.get("date", "")  # use legacy date format
 
-        if not _validate_bools([use_concept_tags, thumbs]):
-            return _abort(
-                400, "Bad Request: concept_tags and thumbs must be boolean values."
-            )
+        count = args.get("count", "")
+
+        start_date = args.get("start_date", "")  # date_from - remove dashes
+        end_date = args.get("end_date", "")  # date_to - remove dashes
 
         if not count and not start_date and not end_date:
-            return _get_json_for_date(input_date, use_concept_tags, thumbs)
+            if not input_date:
+                input_date = date.today().strftime("%y%m%d")
+            if "-" in input_date:
+                input_date = str(input_date).replace("-", "")[2:]
+            return _get_json_for_date(input_date)
 
         elif not input_date and not start_date and not end_date and count:
-            return _get_json_for_random_dates(int(count), use_concept_tags, thumbs)
+            return _get_json_for_random_dates(int(count))
 
         elif not count and not input_date and start_date:
-            return _get_json_for_date_range(
-                start_date, end_date, use_concept_tags, thumbs
-            )
+            return _get_json_for_date_range(start_date, end_date)
 
         else:
             return _abort(400, "Bad Request: invalid field combination passed.")

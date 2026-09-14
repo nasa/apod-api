@@ -30,14 +30,19 @@
           There are no images for tomorrow available through this API. <i>Defaults to today's date.</i></td>
       </tr>
       <tr>
-        <td><b>concept_tags</b></td>
-        <td>A boolean indicating whether concept tags should be returned with the
-          rest of the response. The concept tags are not necessarily included in the explanation, but
-          rather derived from common search tags that are associated with the description text.
-          (Better than just pure text search.). <i>Defaults to False.</i></td>
+        <td><b>count</b></td>
+        <td>An integer which will return the specified number of random images. Cannot exceed 25.</td>
       </tr>
     </tbody>
   </table>
+  </p>
+  <p>
+    Effective September 10, 2026 this API will act as a passthrough to https://science.nasa.gov/wp-json/wp/v2/apod-basic<br>
+    The following filters are no longer supported: "hd", "thumbs", "concept_tags"<br>
+    The response payload will be different, and larger, see notes below.<br>
+    You should not need to update your code or projects at this time.<br>
+    This API will be taken offline on December 1, 2026. You will need to change over by then.<br>
+    Full documentation can be found <a target="_blank" href="https://schlotterer.notion.site/APOD-Feed-And-API-User-Guide-39697d8747c38015a53edfdde76d4f5e">here</a>.
   </p>
   <p>
     For example, using curl (http://curl.haxx.se):
@@ -45,7 +50,7 @@
   <p>
     <font size="+2">
 <pre>
-curl "http://{{ service_url }}/{{ version }}/{{ methodname }}/?concept_tags=True&amp;date=2015-10-11"
+curl "http://{{ service_url }}/{{ version }}/{{ methodname }}/?date=2015-10-11"
 </pre>
     </font>
   </p>
@@ -57,12 +62,19 @@ curl "http://{{ service_url }}/{{ version }}/{{ methodname }}/?concept_tags=True
   <p>
   <pre>
 {
-  "concepts": "concept_tags functionality turned off in current service",
+  "alt": "See Explanation. Clicking on the picture will download the highest resolution version available.",
+  "basic_html": "\u003C!doctype html\u003E\n\u003Chtml\u003E\n\u003Chead\u003E\n\u003Cmeta [data truncated] ,
+  "basic_html_url": "https://science.nasa.gov/wp-json/wp/v2/apod-basic/151011/html",
+  "copyright": "\u003Cb\u003E Image Credit: \u003C/b\u003E \u003Ca href=\"http://www.naoj.org/Introduction/index.html\" [data truncated] ,
+  "credit": "\u003Cb\u003E Image Credit: \u003C/b\u003E \u003Ca href=\"http://www.naoj.org/Introduction/index.html\" [data truncated] ,
   "date": "2015-10-11",
-  "explanation": "Clouds of glowing gas mingle with dust lanes in the Trifid Nebula, a star forming region toward the constellation of the Archer (Sagittarius).  In the center, the three prominent dust lanes that give the Trifid its name all come together. Mountains of opaque dust appear on the right, while other dark filaments of dust are visible threaded throughout the nebula.  A single massive star visible near the center causes much of the Trifid's glow.  The Trifid, also known as M20, is only about 300,000 years old, making it among the youngest emission nebulae known.  The nebula lies about 9,000 light years away and the part pictured here spans about 10 light years.  The above image is a composite with luminance taken from an image by the 8.2-m ground-based Subaru Telescope, detail provided by the 2.4-m orbiting Hubble Space Telescope, color data provided by Martin Pugh and image assembly and processing provided by Robert Gendler.   Follow APOD on: Facebook,  Google Plus, or Twitter",
-  "service_version": "v1",
+  "explanation": "\u003Cstrong\u003EExplanation:\u003C/strong\u003E Clouds of glowing gas mingle with dust lanes in the [data truncated] ,
+  "hdurl": "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2015/october/Trifid_HubbleGendler_2400.jpg [data truncated] ,
+  "media_type": "image",
+  "permalink": "https://science.nasa.gov/image-article/apod-2015-october-11-in-the-center-of-the-trifid-nebula/",
+  "post_id": 1236502,
   "title": "In the Center of the Trifid Nebula",
-  "url": "http://apod.nasa.gov/apod/image/1510/Trifid_HubbleGendler_960.jpg"
+  "url": "https://science.nasa.gov/image-article/apod-2015-october-11-in-the-center-of-the-trifid-nebula/"
 }
 </pre>
   </p>
@@ -77,37 +89,44 @@ curl "http://{{ service_url }}/{{ version }}/{{ methodname }}/?concept_tags=True
         <th>Description</th>
       </tr>
       <tr>
-        <td><b>resource</b></td>
-        <td>A dictionary describing the `image_set` or `planet` that the
-          response illustrates, completely determined by the structured endpoint</td>
+        <td><b>date</b></td>
+        <td>APOD date in YYYY-MM-DD format.</td>
       </tr>
       <tr>
-        <td><b>concept_tags</b></td>
-        <td>A boolean reflection of the supplied option. Included in response because of default values.</td>
+        <td><b>post_id</b></td>
+        <td>WordPress post ID.</td>
       </tr>
       <tr>
         <td><b>title</b></td>
-        <td>The title of the image.</td>
+        <td>APOD post title.</td>
       </tr>
       <tr>
-        <td><b>date</b></td>
-        <td>Date of image. Included in response because of default values.</td>
+        <td><b>permalink</b></td>
+        <td>URL of the APOD post on the site.</td>
       </tr>
       <tr>
-        <td><b>url</b></td>
-        <td>The URL of the APOD image of the day.</td>
+        <td><b>media_type</b></td>
+        <td>Normalized APOD media type, such as image, video, or iframe.</td>
       </tr>
       <tr>
         <td><b>explanation</b></td>
-        <td>The supplied text explanation of the image.</td>
+        <td>APOD explanation text.</td>
       </tr>
       <tr>
-        <td><b>concepts</b></td>
-        <td>The most relevant concepts within the text explanation. Only supplied if `concept_tags` is set to True.</td>
+        <td><b>url</b></td>
+        <td>APOD post URL. This matches the permalink.</td>
       </tr>
       <tr>
-        <td><b>thumbnail_url</b></td>
-        <td>The URL of thumbnail of the video. Only supplied if `thumbs` is set to True.</td>
+        <td><b>hdurl</b></td>
+        <td>Full-size featured image URL when available.</td>
+      </tr>
+      <tr>
+        <td><b>basic_html</b></td>
+        <td>APOD Basic HTML document as a JSON string.</td>
+      </tr>
+      <tr>
+        <td><b>basic_html_url</b></td>
+        <td>Plain-text HTML source URL for easier copy/paste workflows.</td>
       </tr>
     </tbody>
   </table>

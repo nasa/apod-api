@@ -6,16 +6,14 @@ from PIL import Image
 
 
 def get_data(api_key):
+    from datetime import date
+
+    use_date = date.today().strftime("%y%m%d")
     raw_response = requests.get(
         f"https://api.nasa.gov/planetary/apod?api_key={api_key}"
     ).text
     response = json.loads(raw_response)
     return response
-
-
-def get_date(response):
-    date = response["date"]
-    return date
 
 
 def get_explaination(response):
@@ -33,14 +31,9 @@ def get_media_type(response):
     return media_type
 
 
-def get_service_version(response):
-    service_version = response["service_version"]
-    return service_version
-
-
 def get_title(response):
-    service_version = response["title"]
-    return service_version
+    title = response["title"]
+    return title
 
 
 def get_url(response):
