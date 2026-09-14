@@ -8,6 +8,7 @@ The backend has been rewired to point to the new <a href=" https://science.nasa.
 This API will pass your call to the new endpoint and return the result.
 This readme has been updated with the new return values and their meaning.
 This repo will be archived and will be pointed to the new end point on December 1, 2026.
+You should not need to update your code or projects at this time.
 Full documentation can be found <a target="_blank" href="https://schlotterer.notion.site/APOD-Feed-And-API-User-Guide-39697d8747c38015a53edfdde76d4f5e">here</a>.
 
 #### Code "refresh" has occured 1-21-2026!

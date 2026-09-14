@@ -10,9 +10,9 @@ def get_data(api_key):
 
     use_date = date.today().strftime("%y%m%d")
     raw_response = requests.get(
-        f"https://science.nasa.gov/wp-json/wp/v2/apod-basic/?api_key={api_key}"
+        f"https://api.nasa.gov/planetary/apod?api_key={api_key}"
     ).text
-    response = json.loads(raw_response)[0]
+    response = json.loads(raw_response)
     return response
 
 
