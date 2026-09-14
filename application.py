@@ -166,8 +166,12 @@ def _get_json_for_date_range(start_date, end_date):
 
     # get the date param
     if not end_date:
-        # fall back to using today's date IF they didn't specify a date
-        end_date = start_date
+        from datetime import timedelta
+
+        # fall back to using day 25 days in the future to give a substantive response
+        initial_day = datetime.strptime(start_date, "%Y-%m-%d")
+        future_date = initial_day + timedelta(days=25)
+        end_date = future_date.strftime("%Y-%m-%d")
 
     end_dt = datetime.strptime(end_date, "%Y-%m-%d")
 
