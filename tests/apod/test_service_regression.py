@@ -22,6 +22,7 @@ def apod_entry(d):
         "date": d,
         "title": f"APOD {d}",
         "hdurl": f"https://apod.nasa.gov/img/{d}.jpg",
+        "url": f"https://science.nasa.gov/image-article/apod-{d}/",
         "media_type": "image",
         "explanation": "explanation text",
     }
@@ -97,13 +98,39 @@ class TestRegression(unittest.TestCase):
         self.assertIn("banana", r.get_json()["msg"])
 
     def test_valid_date_passthrough(self):
+        # documented contract: 'url' matches the permalink, upstream native field
         entry = apod_entry("2026-09-08")
         with patch("application.requests.get", return_value=FakeResponse(200, entry)):
             r = self.client.get("/v1/apod/?date=2026-09-08")
         self.assertEqual(r.status_code, 200)
         body = r.get_json()
-        self.assertEqual(body["url"], entry["hdurl"])
+        self.assertEqual(body["url"], entry["url"])
+        self.assertEqual(body["hdurl"], entry["hdurl"])
         self.assertEqual(body["service_version"], "v1")
+
+    def test_video_entry_without_hdurl(self):
+        # hdurl is only "available" for some entries: must not crash the service
+        entry = apod_entry("2026-09-13")
+        del entry["hdurl"]
+        entry["media_type"] = "video"
+        with patch("application.requests.get", return_value=FakeResponse(200, entry)):
+            r = self.client.get("/v1/apod/?date=2026-09-13")
+        self.assertEqual(r.status_code, 200)
+        body = r.get_json()
+        self.assertEqual(body["url"], entry["url"])
+        self.assertEqual(body["media_type"], "video")
+
+    def test_range_items_keep_permalink(self):
+        page = [apod_entry(f"2026-08-{d:02d}") for d in range(1, 26)]
+        with patch(
+            "application.requests.get",
+            side_effect=lambda url, **kw: FakeResponse(200, page),
+        ):
+            r = self.client.get("/v1/apod/?start_date=2026-08-01&end_date=2026-08-05")
+        self.assertEqual(r.status_code, 200)
+        for item in r.get_json():
+            self.assertTrue(item["url"].startswith("https://science.nasa.gov/image-article/"))
+            self.assertTrue(item["hdurl"].startswith("https://apod.nasa.gov/img/"))
 
 
 if __name__ == "__main__":
