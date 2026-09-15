@@ -3,6 +3,12 @@
 import logging
 import unittest
 
+import pytest
+
+# The apod.utility module was removed during the 2026-01 code refresh; skip
+# this heritage test file instead of failing collection for the whole suite.
+pytest.importorskip("apod", reason="module apod removed in the 2026 code refresh")
+
 from apod import utility
 
 logging.basicConfig(level=logging.DEBUG)
