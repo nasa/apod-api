@@ -111,8 +111,10 @@ def _get_json_for_date(input_date):
     data = requests.get(
         f"https://science.nasa.gov/wp-json/wp/v2/apod-basic/{input_date}"
     )
+    if data.status_code != 200:
+        return None
     json_response = data.json()
-    json_response["url"] = json_response["hdurl"]
+    json_response.setdefault("url", json_response.get("hdurl"))
     json_response["service_version"] = SERVICE_VERSION
 
     # return info as JSON
@@ -131,19 +133,22 @@ def _get_json_for_random_dates(count):
         raise ValueError("Count must be positive and cannot exceed 25")
 
     all_data = []
-    for i in range(count):
+    attempts = 0
+    max_attempts = count * 3  # cap so a down upstream returns fewer, never hangs
+    while len(all_data) < count and attempts < max_attempts:
+        attempts += 1
         rand_date = _gen_date_after_date(date(1995, 6, 16))
         format_date = str(rand_date).replace("-", "")[2:]
         data = requests.get(
             f"https://science.nasa.gov/wp-json/wp/v2/apod-basic/{format_date}"
         )
 
-        # Handle case where no data is available
-        if not data:
+        # Handle case where no data is available: retry with another date
+        if data.status_code != 200:
             continue
 
         json_response = data.json()
-        json_response["url"] = json_response["hdurl"]
+        json_response.setdefault("url", json_response.get("hdurl"))
         json_response["service_version"] = SERVICE_VERSION
 
         all_data.append(json_response)
@@ -166,12 +171,7 @@ def _get_json_for_date_range(start_date, end_date):
 
     # get the date param
     if not end_date:
-        from datetime import timedelta
-
-        # fall back to using day 25 days in the future to give a substantive response
-        initial_day = datetime.strptime(start_date, "%Y-%m-%d")
-        future_date = initial_day + timedelta(days=25)
-        end_date = future_date.strftime("%Y-%m-%d")
+        end_date = date.today().strftime("%Y-%m-%d")
 
     end_dt = datetime.strptime(end_date, "%Y-%m-%d")
 
@@ -180,18 +180,34 @@ def _get_json_for_date_range(start_date, end_date):
 
     use_start_date = str(start_date).replace("-", "")[2:]
     use_end_date = str(end_date).replace("-", "")[2:]
+    base_url = f"https://science.nasa.gov/wp-json/wp/v2/apod-basic?date_from={use_start_date}&date_to={use_end_date}"
 
-    data = requests.get(
-        f"https://science.nasa.gov/wp-json/wp/v2/apod-basic?date_from={use_start_date}&date_to={use_end_date}"
-    )
-    json_response = data.json()
+    all_data = []
+    seen_dates = set()
+    page = 1
+    while True:
+        data = requests.get(f"{base_url}&page={page}")
+        if data.status_code != 200:
+            break
+        json_response = data.json()
+        if not isinstance(json_response, list) or not json_response:
+            break
 
-    for item in json_response:
-        item["url"] = item["hdurl"]
-        item["service_version"] = SERVICE_VERSION
+        # the upstream endpoint ignores unknown query parameters: when asked for
+        # a page beyond its results it repeats page 1 — stop instead of duplicating
+        page_dates = {item.get("date") for item in json_response}
+        if page > 1 and page_dates & seen_dates:
+            break
+        seen_dates |= page_dates
+
+        for item in json_response:
+            item.setdefault("url", item.get("hdurl"))
+            item["service_version"] = SERVICE_VERSION
+        all_data.extend(json_response)
+        page += 1
 
     # return info as JSON
-    return json_response
+    return all_data
 
 
 #
@@ -235,7 +251,14 @@ def apod():
                 input_date = date.today().strftime("%y%m%d")
             if "-" in input_date:
                 input_date = str(input_date).replace("-", "")[2:]
-            return _get_json_for_date(input_date)
+            result = _get_json_for_date(input_date)
+            if result is None:
+                return _abort(
+                    400,
+                    f"Bad Request: no APOD entry found for date '{input_date}'.",
+                    False,
+                )
+            return result
 
         elif not input_date and not start_date and not end_date and count:
             return _get_json_for_random_dates(int(count))
