@@ -22,7 +22,7 @@ from random import shuffle
 from flask import Flask, current_app, jsonify, render_template, request
 from flask_cors import CORS
 
-from apod.utility import get_concepts, parse_apod
+from apod.utility import apod_handler, parse_apod, parse_apod_range
 
 app = Flask(__name__)
 CORS(
@@ -119,35 +119,35 @@ def _validate_bools(bool_args: list):
     return True
 
 
-def _apod_handler(
-    dt, use_concept_tags=False, use_default_today_date=False, thumbs=False
-):
-    """
-    Accepts a parameter dictionary. Returns the response object to be
-    served through the API.
-    """
-    try:
-        page_props = parse_apod(dt, use_default_today_date, thumbs)
-        if not page_props:
-            return None
-        LOG.debug("managed to get apod page characteristics")
+# def _apod_handler_old(
+#     dt, use_concept_tags=False, use_default_today_date=False, thumbs=False
+# ):
+#     """
+#     Accepts a parameter dictionary. Returns the response object to be
+#     served through the API.
+#     """
+#     try:
+#         page_props = parse_apod(dt, use_default_today_date, thumbs)
+#         if not page_props:
+#             return None
+#         LOG.debug("managed to get apod page characteristics")
 
-        if use_concept_tags:
-            if ALCHEMY_API_KEY is None:
-                page_props["concepts"] = (
-                    "concept_tags functionality turned off in current service"
-                )
-            else:
-                page_props["concepts"] = get_concepts(
-                    request, page_props["explanation"], ALCHEMY_API_KEY
-                )
+#         if use_concept_tags:
+#             if ALCHEMY_API_KEY is None:
+#                 page_props["concepts"] = (
+#                     "concept_tags functionality turned off in current service"
+#                 )
+#             else:
+#                 page_props["concepts"] = get_concepts(
+#                     request, page_props["explanation"], ALCHEMY_API_KEY
+#                 )
 
-        return page_props
+#         return page_props
 
-    except Exception as e:
-        LOG.error("Internal Service Error :" + str(type(e)) + " msg:" + str(e))
-        # return code 500 here
-        return _abort(500, "Internal Service Error", usage=False)
+#     except Exception as e:
+#         LOG.error("Internal Service Error :" + str(type(e)) + " msg:" + str(e))
+#         # return code 500 here
+#         return _abort(500, "Internal Service Error", usage=False)
 
 
 def _get_json_for_date(input_date, use_concept_tags, thumbs):
@@ -197,7 +197,8 @@ def _get_json_for_date(input_date, use_concept_tags, thumbs):
     if key in RESULTS_DICT.keys():
         data = RESULTS_DICT[key]
     else:
-        data = _apod_handler(dt, use_concept_tags, use_default_today_date, thumbs)
+        data = parse_apod(dt)
+        data = apod_handler(data, use_concept_tags, thumbs)
 
     # Handle case where no data is available
     if not data:
@@ -247,9 +248,7 @@ def _get_json_for_random_dates(count, use_concept_tags, thumbs):
     all_data = []
     for date_ordinal in random_date_ordinals:
         dt = date.fromordinal(date_ordinal)
-        data = _apod_handler(
-            dt, use_concept_tags, date_ordinal == today_ordinal, thumbs
-        )
+        data = parse_apod(dt)
 
         # Handle case where no data is available
         if not data:
@@ -262,6 +261,8 @@ def _get_json_for_random_dates(count, use_concept_tags, thumbs):
         all_data.append(data)
         if len(all_data) >= count:
             break
+
+    all_data = apod_handler(all_data, use_concept_tags, thumbs)
 
     return jsonify(all_data)
 
@@ -295,32 +296,9 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
     if start_ordinal > end_ordinal:
         raise ValueError("start_date cannot be after end_date")
 
-    all_data = []
-
-    while start_ordinal <= end_ordinal:
-        # get data
-        dt = date.fromordinal(start_ordinal)
-
-        data = _apod_handler(
-            dt, use_concept_tags, start_ordinal == today_ordinal, thumbs
-        )
-
-        # Handle case where no data is available
-        if not data:
-            start_ordinal += 1
-            continue
-
-        if not isinstance(data, dict):
-            start_ordinal += 1
-            continue
-
-        data["service_version"] = SERVICE_VERSION
-
-        if data["date"] == dt.isoformat():
-            # Handles edge case where server is a day ahead of NASA APOD service
-            all_data.append(data)
-
-        start_ordinal += 1
+    # fetch data
+    all_data = parse_apod_range(start_dt, end_dt)
+    all_data = apod_handler(all_data, use_concept_tags, thumbs)
 
     # return info as JSON
     return jsonify(all_data)
@@ -391,7 +369,7 @@ def apod():
         if etype is ValueError or "BadRequest" in str(etype):
             return _abort(400, str(ex) + ".")
         else:
-            LOG.error("Service Exception. Msg: " + str(type(ex)))
+            LOG.error("Service Exception. Msg: " + str(ex), exc_info=app.debug)
             return _abort(500, "Internal Service Error", usage=False)
 
 
