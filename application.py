@@ -119,37 +119,6 @@ def _validate_bools(bool_args: list):
     return True
 
 
-# def _apod_handler_old(
-#     dt, use_concept_tags=False, use_default_today_date=False, thumbs=False
-# ):
-#     """
-#     Accepts a parameter dictionary. Returns the response object to be
-#     served through the API.
-#     """
-#     try:
-#         page_props = parse_apod(dt, use_default_today_date, thumbs)
-#         if not page_props:
-#             return None
-#         LOG.debug("managed to get apod page characteristics")
-
-#         if use_concept_tags:
-#             if ALCHEMY_API_KEY is None:
-#                 page_props["concepts"] = (
-#                     "concept_tags functionality turned off in current service"
-#                 )
-#             else:
-#                 page_props["concepts"] = get_concepts(
-#                     request, page_props["explanation"], ALCHEMY_API_KEY
-#                 )
-
-#         return page_props
-
-#     except Exception as e:
-#         LOG.error("Internal Service Error :" + str(type(e)) + " msg:" + str(e))
-#         # return code 500 here
-#         return _abort(500, "Internal Service Error", usage=False)
-
-
 def _get_json_for_date(input_date, use_concept_tags, thumbs):
     """
     This returns the JSON data for a specific date, which must be a string of the form YYYY-MM-DD. If date is None,
