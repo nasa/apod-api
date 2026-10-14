@@ -123,50 +123,42 @@ def _get_json_for_date(input_date, use_concept_tags, thumbs):
     """
     This returns the JSON data for a specific date, which must be a string of the form YYYY-MM-DD. If date is None,
     then it defaults to the current date.
-    :param input_date:
-    :param use_concept_tags:
-    :param thumbs:
-    :return:
+
+    :param input_date: YYYY-MM-DD format of date to request.
+    :param use_concept_tags: bool indicating whether to return concept tags, if available.
+    :param thumbs: bool indicating whether to return a thumbnail URL, if the media is a video.
+    :return: JSON APOD data as a dict.
     """
 
-    # get the date param
+    # default date
     use_default_today_date = False
     if not input_date:
         # fall back to using today's date IF they didn't specify a date
         use_default_today_date = True
-        dt = input_date  # None
-        key = datetime.now(timezone.utc).date()
-        key = (
-            str(key.year)
-            + "y"
-            + str(key.month)
-            + "m"
-            + str(key.day)
-            + "d"
-            + str(use_concept_tags)
-            + str(thumbs)
-        )
+        dt = datetime.now().date()
 
-    # validate input date
+    # use date param
     else:
         dt = datetime.strptime(input_date, "%Y-%m-%d").date()
-        _validate_date(dt)
-        key = (
-            str(dt.year)
-            + "y"
-            + str(dt.month)
-            + "m"
-            + str(dt.day)
-            + "d"
-            + str(use_concept_tags)
-            + str(thumbs)
-        )
+
+    # validate input date
+    _validate_date(dt)
+    key = (
+        str(dt.year)
+        + "y"
+        + str(dt.month)
+        + "m"
+        + str(dt.day)
+        + "d"
+        + str(use_concept_tags)
+        + str(thumbs)
+    )
 
     # get data
     if key in RESULTS_DICT.keys():
         data = RESULTS_DICT[key]
     else:
-        data = parse_apod(dt)
+        data = parse_apod(dt, use_default_today_date)
         data = apod_handler(data, use_concept_tags, thumbs)
 
     # Handle case where no data is available
@@ -201,10 +193,11 @@ def _get_json_for_date(input_date, use_concept_tags, thumbs):
 def _get_json_for_random_dates(count, use_concept_tags, thumbs):
     """
     This returns the JSON data for a set of randomly chosen dates. The number of dates is specified by the count
-    parameter
-    :param count:
-    :param use_concept_tags:
-    :return:
+    parameter.
+
+    :param count: Number of random APODs to return.
+    :param use_concept_tags: bool indicating whether to return concept tags, if available.
+    :return: JSON APOD data as a list of dicts.
     """
     if count > 100 or count <= 0:
         raise ValueError("Count must be positive and cannot exceed 100")
@@ -240,10 +233,12 @@ def _get_json_for_date_range(start_date, end_date, use_concept_tags, thumbs):
     """
     This returns the JSON data for a range of dates, specified by start_date and end_date, which must be strings of the
     form YYYY-MM-DD. If end_date is None then it defaults to the current date.
-    :param start_date:
-    :param end_date:
-    :param use_concept_tags:
-    :return:
+
+    :param start_date: YYYY-MM-DD format of first date in range.
+    :param end_date: YYYY-MM-DD format of last date in range.
+    :param use_concept_tags: bool indicating whether to return concept tags, if available.
+    :param thumbs: bool indicating whether to return a thumbnail URL, if the media is a video.
+    :return: JSON APOD data as a list of dicts.
     """
     # validate input date
     start_dt = datetime.strptime(start_date, "%Y-%m-%d").date()

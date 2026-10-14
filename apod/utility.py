@@ -30,17 +30,34 @@ API_BASE = "https://science.nasa.gov/wp-json/wp/v2"
 http = urllib3.PoolManager()
 
 
-def parse_apod(dt):
-    if dt is None:
-        dt = datetime.datetime.today()
-    dt_str = dt.strftime("%y%m%d")
-    apod_url = f"{API_BASE}/apod-basic/{dt_str}"
+def parse_apod(date, fallback=False):
+    """
+    Get an APOD from the Wordpress JSON API.
+
+    :param: date: datetime.date object, the date to request.
+    :param: fallback: bool indicating whether to fall back to the previous date if a request 404s,
+    should be used if using a default date in case the latest APOD hasn't been posted yet.
+    :return: dict containing APOD data.
+    """
+    date_str = date.strftime("%y%m%d")
+    apod_url = f"{API_BASE}/apod-basic/{date_str}"
     res = requests.get(apod_url)
+    if res.status_code == 404 and fallback:
+        LOG.debug("404 on current date, falling back on to previous date")
+        new_date = date - datetime.timedelta(days=1)
+        return parse_apod(new_date, False) # only fall back one day
     j = res.json()
     return j
 
 
 def parse_apod_range(date_from, date_to):
+    """
+    Get a range of APOD dates from the Wordpress JSON API. Ranges are end-inclusive.
+
+    :param: date_from: datetime.date object, the starting date of the range to request.
+    :param: date_to: datetime.date object, the end date of the range to request.
+    :return: list of dicts containing APOD data.
+    """
     apods = []
 
     page = 1
@@ -58,6 +75,8 @@ def parse_apod_range(date_from, date_to):
 
         page += 1
     
+    # should be ordered earliest date to latest date
+    apods.reverse()
     return apods
 
 
@@ -67,10 +86,15 @@ def apod_handler(
     """
     Formats WP API responses to match legacy API format. Returns the response object to be
     served through the API.
+
+    :param: apods: list of dicts containing APOD data, if processing a range.
+    Single dict, if processing one APOD.
+    :param: use_concept_tags: bool indicating whether to get concept tags, if available. 
+    :param: thumbs: bool indicating whether to get thumbnails, if media_type is "video".
     """
     if isinstance(apods, dict):
         apods = [apods]
-    LOG.debug(f"_apod_handler called for {len(apods)} APODs")
+    LOG.debug(f"apod_handler called for {len(apods)} APODs")
     out_apods = []
     try:
         for apod in apods:
