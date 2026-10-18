@@ -28,7 +28,7 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
-addopts = "--cov=apod --cov-report=term-missing"
+addopts = "--cov=application --cov-report=term-missing"
 pythonpath = ["."]
 
 [tool.ruff.lint]
