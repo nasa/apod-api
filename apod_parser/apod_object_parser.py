@@ -42,7 +42,7 @@ def get_url(response):
 
 
 def download_image(url, date):
-    if os.path.isfile(f"{date}.png") == False:
+    if os.path.isfile(f"{date}.jpg") == False:
         raw_image = requests.get(url).content
         with open(f"{date}.jpg", "wb") as file:
             file.write(raw_image)
